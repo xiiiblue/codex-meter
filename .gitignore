@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+.swiftpm/
+Package.resolved
+
+# 图标源文件保留Assets/AppIcon.png和Assets/AppIcon.icns即可。
+AppIcon.iconset/
+Assets/AppIcon.tiff
+
+# 本地运行日志和LaunchAgent输出。
+*.log
