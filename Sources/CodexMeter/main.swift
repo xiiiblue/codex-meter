@@ -388,6 +388,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var client: CodexUsageClient!
     private var latestSnapshot: MeterSnapshot?
     private var latestRefreshError: String?
+    private var latestRefreshErrorAt: Date?
     private let authPath = NSString(string: "~/.codex/auth.json").expandingTildeInPath
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -417,6 +418,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 let snapshot = try await client.fetchUsage()
                 latestSnapshot = snapshot
                 latestRefreshError = nil
+                latestRefreshErrorAt = nil
                 render(snapshot)
             } catch {
                 render(error)
@@ -433,6 +435,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func render(_ error: Error) {
         latestRefreshError = error.localizedDescription
+        latestRefreshErrorAt = Date()
         if let latestSnapshot {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
         } else {
@@ -456,10 +459,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if let planType = snapshot.planType {
                 menu.addItem(NSMenuItem(title: "订阅: \(planType)", action: nil, keyEquivalent: ""))
             }
-            menu.addItem(NSMenuItem(title: "刷新: \(format(snapshot.refreshedAt))", action: nil, keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: "上次成功刷新: \(format(snapshot.refreshedAt))", action: nil, keyEquivalent: ""))
+            if let nextRefreshAt = timer?.fireDate {
+                menu.addItem(NSMenuItem(title: "下次刷新: \(format(nextRefreshAt))", action: nil, keyEquivalent: ""))
+            }
             if let refreshError {
                 menu.addItem(.separator())
-                menu.addItem(NSMenuItem(title: "上次刷新失败: \(refreshError)", action: nil, keyEquivalent: ""))
+                let failedAt = latestRefreshErrorAt.map(format) ?? "未知时间"
+                menu.addItem(NSMenuItem(title: "上次刷新失败: \(failedAt)", action: nil, keyEquivalent: ""))
+                menu.addItem(NSMenuItem(title: "失败原因: \(refreshError)", action: nil, keyEquivalent: ""))
             }
         } else if let message {
             menu.addItem(NSMenuItem(title: message, action: nil, keyEquivalent: ""))
