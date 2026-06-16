@@ -93,8 +93,29 @@ struct RefreshInterval: CaseIterable {
     }
 }
 
+enum DisplayMode: String, CaseIterable {
+    case dayWeek = "day_week"
+    case compact = "compact"
+    case lowestOnly = "lowest_only"
+    case dayOnly = "day_only"
+
+    var title: String {
+        switch self {
+        case .dayWeek:
+            return "日24% 周32%"
+        case .compact:
+            return "D24 W32"
+        case .lowestOnly:
+            return "Codex 24%"
+        case .dayOnly:
+            return "仅日限额"
+        }
+    }
+}
+
 enum Preferences {
     private static let refreshIntervalKey = "refreshIntervalSeconds"
+    private static let displayModeKey = "displayMode"
 
     static var refreshIntervalSeconds: TimeInterval {
         get {
@@ -106,6 +127,19 @@ enum Preferences {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: refreshIntervalKey)
+        }
+    }
+
+    static var displayMode: DisplayMode {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: displayModeKey),
+                  let mode = DisplayMode(rawValue: rawValue) else {
+                return .dayWeek
+            }
+            return mode
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: displayModeKey)
         }
     }
 }
@@ -427,9 +461,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func render(_ snapshot: MeterSnapshot) {
-        let day = snapshot.primary?.remainingPercent
-        let week = snapshot.secondary?.remainingPercent
-        statusItem.button?.title = "日\(day.map(String.init) ?? "--")% 周\(week.map(String.init) ?? "--")%"
+        statusItem.button?.title = statusTitle(for: snapshot)
         rebuildMenu(snapshot: snapshot, refreshError: latestRefreshError)
     }
 
@@ -529,6 +561,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         intervalItem.submenu = intervalMenu
         menu.addItem(intervalItem)
+
+        let currentDisplayMode = Preferences.displayMode
+        let displayModeItem = NSMenuItem(title: "显示模式", action: nil, keyEquivalent: "")
+        let displayModeMenu = NSMenu()
+        for mode in DisplayMode.allCases {
+            let item = NSMenuItem(title: mode.title, action: #selector(setDisplayMode), keyEquivalent: "")
+            item.target = self
+            item.representedObject = mode.rawValue
+            item.state = mode == currentDisplayMode ? .on : .off
+            displayModeMenu.addItem(item)
+        }
+        displayModeItem.submenu = displayModeMenu
+        menu.addItem(displayModeItem)
     }
 
     private func addLimitItem(_ limit: LimitSnapshot?) {
@@ -611,6 +656,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         rebuildCurrentMenu()
     }
 
+    @objc private func setDisplayMode(_ sender: NSMenuItem) {
+        guard let rawValue = sender.representedObject as? String,
+              let mode = DisplayMode(rawValue: rawValue) else {
+            return
+        }
+        Preferences.displayMode = mode
+        if let latestSnapshot {
+            render(latestSnapshot)
+        } else {
+            rebuildCurrentMenu()
+        }
+    }
+
     private func rebuildCurrentMenu() {
         if let latestSnapshot {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
@@ -633,6 +691,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .enabled, .stale:
             return true
         }
+    }
+
+    private func statusTitle(for snapshot: MeterSnapshot) -> String {
+        let day = snapshot.primary?.remainingPercent
+        let week = snapshot.secondary?.remainingPercent
+
+        switch Preferences.displayMode {
+        case .dayWeek:
+            return "日\(percentText(day)) 周\(percentText(week))"
+        case .compact:
+            return "D\(percentText(day)) W\(percentText(week))"
+        case .lowestOnly:
+            let values = [day, week].compactMap { $0 }
+            return "Codex \(percentText(values.min()))"
+        case .dayOnly:
+            return "日\(percentText(day))"
+        }
+    }
+
+    private func percentText(_ value: Int?) -> String {
+        guard let value else {
+            return "--%"
+        }
+        return "\(value)%"
     }
 
     private func showError(_ message: String) {
