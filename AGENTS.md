@@ -23,3 +23,4 @@
 - 如果Codex后端字段变化，优先用`codex app-server generate-ts`重新查看`GetAccountRateLimitsResponse`、`RateLimitSnapshot`和相关usage字段。
 - 若要打包成`.app`，可在现有SwiftPM可执行产物外增加一个轻量bundle脚本，保持主逻辑仍在`Sources/CodexMeter/main.swift`。
 - 正式给其他用户分发前，查看`RELEASE.md`中的Developer ID签名、公证、staple和spctl验证流程。
+- 后续优化计划记录在`ROADMAP.md`，优先处理刷新失败保留旧值、低额度提醒和刷新详情增强。
