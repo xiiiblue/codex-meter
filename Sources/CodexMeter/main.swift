@@ -536,7 +536,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let reset = limit.resetAt.map { "，重置: \(format($0))" } ?? ""
+        let reset = limit.resetAt.map { "，重置: \(format($0))（\(relativeTimeDescription(until: $0))）" } ?? ""
         menu.addItem(NSMenuItem(title: "\(limit.title): 剩余\(limit.remainingPercent)%\(reset)", action: nil, keyEquivalent: ""))
     }
 
@@ -553,6 +553,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             return nil
         }
+    }
+
+    private func relativeTimeDescription(until date: Date) -> String {
+        let interval = max(0, date.timeIntervalSinceNow)
+        let minutes = Int(interval / 60)
+        if minutes < 60 {
+            return "约\(max(1, minutes))分钟后"
+        }
+
+        let hours = minutes / 60
+        if hours < 48 {
+            return "约\(hours)小时后"
+        }
+
+        let days = hours / 24
+        return "约\(days)天后"
     }
 
     private func format(_ date: Date) -> String {
