@@ -455,6 +455,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let snapshot {
             addLimitItem(snapshot.primary)
             addLimitItem(snapshot.secondary)
+            let warnings = lowQuotaWarnings(for: snapshot)
+            if !warnings.isEmpty {
+                menu.addItem(.separator())
+                for warning in warnings {
+                    menu.addItem(NSMenuItem(title: warning, action: nil, keyEquivalent: ""))
+                }
+            }
             menu.addItem(.separator())
             if let planType = snapshot.planType {
                 menu.addItem(NSMenuItem(title: "订阅: \(planType)", action: nil, keyEquivalent: ""))
@@ -531,6 +538,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let reset = limit.resetAt.map { "，重置: \(format($0))" } ?? ""
         menu.addItem(NSMenuItem(title: "\(limit.title): 剩余\(limit.remainingPercent)%\(reset)", action: nil, keyEquivalent: ""))
+    }
+
+    private func lowQuotaWarnings(for snapshot: MeterSnapshot) -> [String] {
+        [snapshot.primary, snapshot.secondary].compactMap { limit in
+            guard let limit else {
+                return nil
+            }
+            if limit.remainingPercent <= 10 {
+                return "\(limit.title)额度告急：仅剩\(limit.remainingPercent)%"
+            }
+            if limit.remainingPercent <= 20 {
+                return "\(limit.title)额度偏低：剩余\(limit.remainingPercent)%"
+            }
+            return nil
+        }
     }
 
     private func format(_ date: Date) -> String {
