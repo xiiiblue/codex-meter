@@ -151,6 +151,12 @@ enum MeterError: LocalizedError {
 
 @MainActor
 final class LoginItemManager {
+    enum Status {
+        case disabled
+        case enabled
+        case stale(savedPath: String)
+    }
+
     static let shared = LoginItemManager()
 
     private let label = "local.codex-meter"
@@ -166,8 +172,20 @@ final class LoginItemManager {
         launchAgentsDirectory.appendingPathComponent("\(label).plist")
     }
 
-    var isEnabled: Bool {
-        fileManager.fileExists(atPath: plistURL.path)
+    var currentExecutablePath: String {
+        Bundle.main.executableURL?.path ?? CommandLine.arguments[0]
+    }
+
+    var status: Status {
+        guard fileManager.fileExists(atPath: plistURL.path) else {
+            return .disabled
+        }
+        guard let plist = NSDictionary(contentsOf: plistURL) as? [String: Any],
+              let programArguments = plist["ProgramArguments"] as? [String],
+              let savedPath = programArguments.first else {
+            return .stale(savedPath: "未知路径")
+        }
+        return savedPath == currentExecutablePath ? .enabled : .stale(savedPath: savedPath)
     }
 
     func setEnabled(_ enabled: Bool) throws {
@@ -180,10 +198,9 @@ final class LoginItemManager {
 
     private func enable() throws {
         try fileManager.createDirectory(at: launchAgentsDirectory, withIntermediateDirectories: true)
-        let executablePath = Bundle.main.executableURL?.path ?? CommandLine.arguments[0]
         let plist: [String: Any] = [
             "Label": label,
-            "ProgramArguments": [executablePath],
+            "ProgramArguments": [currentExecutablePath],
             "RunAtLoad": true,
             "KeepAlive": false,
             "StandardOutPath": "/tmp/CodexMeter.out.log",
@@ -469,10 +486,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func addSettingsItems() {
+        let loginStatus = LoginItemManager.shared.status
+        if case .stale = loginStatus {
+            menu.addItem(NSMenuItem(title: "开机自启路径已过期", action: nil, keyEquivalent: ""))
+        }
+
         let loginItem = NSMenuItem(title: "开机自启", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         loginItem.target = self
-        loginItem.state = LoginItemManager.shared.isEnabled ? .on : .off
+        loginItem.state = isLaunchAtLoginEnabled(loginStatus) ? .on : .off
         menu.addItem(loginItem)
+
+        if case .stale = loginStatus {
+            let repairItem = NSMenuItem(title: "修复开机自启路径", action: #selector(repairLaunchAtLogin), keyEquivalent: "")
+            repairItem.target = self
+            menu.addItem(repairItem)
+        }
 
         let currentInterval = Preferences.refreshIntervalSeconds
         let intervalItem = NSMenuItem(title: "刷新频率", action: nil, keyEquivalent: "")
@@ -511,10 +539,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func toggleLaunchAtLogin() {
         do {
-            try LoginItemManager.shared.setEnabled(!LoginItemManager.shared.isEnabled)
+            let shouldEnable = !isLaunchAtLoginEnabled(LoginItemManager.shared.status)
+            try LoginItemManager.shared.setEnabled(shouldEnable)
             rebuildCurrentMenu()
         } catch {
             showError("无法更新开机自启: \(error.localizedDescription)")
+        }
+    }
+
+    @objc private func repairLaunchAtLogin() {
+        do {
+            try LoginItemManager.shared.setEnabled(true)
+            rebuildCurrentMenu()
+        } catch {
+            showError("无法修复开机自启路径: \(error.localizedDescription)")
         }
     }
 
@@ -540,6 +578,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return meterError.guidanceLines
         }
         return nil
+    }
+
+    private func isLaunchAtLoginEnabled(_ status: LoginItemManager.Status) -> Bool {
+        switch status {
+        case .disabled:
+            return false
+        case .enabled, .stale:
+            return true
+        }
     }
 
     private func showError(_ message: String) {
