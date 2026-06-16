@@ -351,6 +351,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var timer: Timer?
     private var client: CodexUsageClient!
     private var latestSnapshot: MeterSnapshot?
+    private var latestRefreshError: String?
     private let authPath = NSString(string: "~/.codex/auth.json").expandingTildeInPath
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -379,6 +380,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             do {
                 let snapshot = try await client.fetchUsage()
                 latestSnapshot = snapshot
+                latestRefreshError = nil
                 render(snapshot)
             } catch {
                 render(error)
@@ -390,15 +392,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let day = snapshot.primary?.remainingPercent
         let week = snapshot.secondary?.remainingPercent
         statusItem.button?.title = "日\(day.map(String.init) ?? "--")% 周\(week.map(String.init) ?? "--")%"
-        rebuildMenu(snapshot: snapshot)
+        rebuildMenu(snapshot: snapshot, refreshError: latestRefreshError)
     }
 
     private func render(_ error: Error) {
-        statusItem.button?.title = "Codex !"
-        rebuildMenu(message: error.localizedDescription)
+        latestRefreshError = error.localizedDescription
+        if let latestSnapshot {
+            rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
+        } else {
+            statusItem.button?.title = "Codex !"
+            rebuildMenu(message: error.localizedDescription)
+        }
     }
 
-    private func rebuildMenu(snapshot: MeterSnapshot? = nil, message: String? = nil) {
+    private func rebuildMenu(snapshot: MeterSnapshot? = nil, message: String? = nil, refreshError: String? = nil) {
         menu = NSMenu()
 
         if let snapshot {
@@ -409,6 +416,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 menu.addItem(NSMenuItem(title: "订阅: \(planType)", action: nil, keyEquivalent: ""))
             }
             menu.addItem(NSMenuItem(title: "刷新: \(format(snapshot.refreshedAt))", action: nil, keyEquivalent: ""))
+            if let refreshError {
+                menu.addItem(.separator())
+                menu.addItem(NSMenuItem(title: "上次刷新失败: \(refreshError)", action: nil, keyEquivalent: ""))
+            }
         } else if let message {
             menu.addItem(NSMenuItem(title: message, action: nil, keyEquivalent: ""))
         }
@@ -488,7 +499,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func rebuildCurrentMenu() {
         if let latestSnapshot {
-            rebuildMenu(snapshot: latestSnapshot)
+            rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
         } else {
             rebuildMenu(message: "正在刷新...")
         }
