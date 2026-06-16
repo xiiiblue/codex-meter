@@ -1,6 +1,7 @@
 .DS_Store
 .build/
 .swiftpm/
+dist/
 Package.resolved
 
 # 图标源文件保留Assets/AppIcon.png和Assets/AppIcon.icns即可。

@@ -14,6 +14,7 @@
 - 刷新策略：启动立即刷新；菜单提供手动刷新和刷新频率选择，频率保存到`UserDefaults`，默认5分钟。
 - 开机自启：菜单中的`开机自启`会创建或删除用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`，ProgramArguments指向当前App可执行文件。
 - 验证命令：`swift run CodexMeter --once`可无GUI拉取并打印剩余额度；`bash scripts/build-app.sh`可生成`.build/CodexMeter.app`。
+- 分发打包：`bash scripts/build-app.sh --universal --sign-identity auto --dmg`会构建Universal Binary、自动选择签名身份并生成`dist/CodexMeter-0.1.0.dmg`；没有`Developer ID Application`证书时会退回ad-hoc签名，不能替代Apple公证。
 - 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
 
 ## 后续交接注意
@@ -21,3 +22,4 @@
 - 不要在日志、README、提交信息或错误输出中写入`access_token`、`refresh_token`、邮箱等敏感信息。
 - 如果Codex后端字段变化，优先用`codex app-server generate-ts`重新查看`GetAccountRateLimitsResponse`、`RateLimitSnapshot`和相关usage字段。
 - 若要打包成`.app`，可在现有SwiftPM可执行产物外增加一个轻量bundle脚本，保持主逻辑仍在`Sources/CodexMeter/main.swift`。
+- 正式给其他用户分发前，查看`RELEASE.md`中的Developer ID签名、公证、staple和spctl验证流程。

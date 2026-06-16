@@ -46,6 +46,21 @@ open .build/CodexMeter.app
 
 应用图标源文件位于`Assets/AppIcon.png`，打包使用`Assets/AppIcon.icns`。
 
+生成可分发的Universal Binary和DMG：
+
+```bash
+bash scripts/build-app.sh --universal --sign-identity auto --dmg
+```
+
+输出文件：
+
+```text
+.build/CodexMeter.app
+dist/CodexMeter-0.1.0.dmg
+```
+
+如果本机没有`Developer ID Application`证书，`--sign-identity auto`会退回ad-hoc签名。ad-hoc签名不等于Apple公证，陌生机器首次打开仍可能被Gatekeeper拦截。正式分发请参考[RELEASE.md](./RELEASE.md)。
+
 ## 选项
 
 - 开机自启：在菜单里勾选`开机自启`后，会写入用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`。
@@ -85,7 +100,10 @@ open .build/CodexMeter.app
 swift build
 swift run CodexMeter --once
 bash scripts/build-app.sh
+bash scripts/build-app.sh --universal --sign-identity auto --dmg
 plutil -lint .build/CodexMeter.app/Contents/Info.plist
+lipo -info .build/CodexMeter.app/Contents/MacOS/CodexMeter
+codesign --verify --deep --strict --verbose=2 .build/CodexMeter.app
 ```
 
 ## 注意
