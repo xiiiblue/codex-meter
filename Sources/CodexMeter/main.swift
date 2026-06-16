@@ -375,7 +375,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func refresh() {
-        statusItem.button?.title = "Codex ..."
         Task {
             do {
                 let snapshot = try await client.fetchUsage()
