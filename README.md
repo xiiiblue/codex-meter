@@ -5,6 +5,7 @@ CodexMeter是一个macOS原生菜单栏小工具，用当前机器的Codex登录
 ## 功能
 
 - 菜单栏直接显示`日xx% 周xx%`。
+- 支持菜单栏显示模式切换：标准、紧凑、仅最低额度、仅日限额。
 - 下拉菜单显示日限额、周限额、重置时间、订阅类型和最近刷新时间。
 - 支持手动刷新。
 - 支持开机自启。
@@ -45,6 +46,7 @@ open .build/CodexMeter.app
 ```
 
 应用图标源文件位于`Assets/AppIcon.png`，打包使用`Assets/AppIcon.icns`。
+DMG背景图位于`Assets/Installer/DmgBackground.png`。
 
 生成可分发的Universal Binary和DMG：
 
@@ -57,6 +59,7 @@ bash scripts/build-app.sh --universal --sign-identity auto --dmg
 ```text
 .build/CodexMeter.app
 dist/CodexMeter-0.1.0.dmg
+dist/CodexMeter-0.1.0.dmg.sha256
 ```
 
 如果本机没有`Developer ID Application`证书，`--sign-identity auto`会退回ad-hoc签名。ad-hoc签名不等于Apple公证，陌生机器首次打开仍可能被Gatekeeper拦截。正式分发请参考[RELEASE.md](./RELEASE.md)。
@@ -76,6 +79,7 @@ DMG里也包含`首次打开说明.txt`。
 
 - 开机自启：在菜单里勾选`开机自启`后，会写入用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`。
 - 刷新频率：菜单里可选`1分钟`、`5分钟`、`15分钟`、`30分钟`、`60分钟`，选择会保存到`UserDefaults`并立即重建刷新计时器。
+- 显示模式：菜单里可切换`日24% 周32%`、`D24 W32`、`Codex 24%`、`仅日限额`。
 
 ## 项目结构
 
@@ -83,9 +87,11 @@ DMG里也包含`首次打开说明.txt`。
 .
 ├── Assets/
 │   ├── AppIcon.icns
-│   └── AppIcon.png
+│   ├── AppIcon.png
+│   └── Installer/DmgBackground.png
 ├── Sources/CodexMeter/main.swift
 ├── scripts/build-app.sh
+├── scripts/release.sh
 ├── Package.swift
 ├── README.md
 └── AGENTS.md
@@ -112,9 +118,11 @@ swift build
 swift run CodexMeter --once
 bash scripts/build-app.sh
 bash scripts/build-app.sh --universal --sign-identity auto --dmg
+bash scripts/release.sh
 plutil -lint .build/CodexMeter.app/Contents/Info.plist
 lipo -info .build/CodexMeter.app/Contents/MacOS/CodexMeter
 codesign --verify --deep --strict --verbose=2 .build/CodexMeter.app
+cat dist/CodexMeter-0.1.0.dmg.sha256
 ```
 
 ## 注意

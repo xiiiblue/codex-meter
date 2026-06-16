@@ -46,6 +46,7 @@ bash scripts/build-app.sh --universal --sign-identity auto --dmg
 
 ```text
 dist/CodexMeter-0.1.0.dmg
+dist/CodexMeter-0.1.0.dmg.sha256
 ```
 
 未公证分发时，DMG会包含：
@@ -53,6 +54,7 @@ dist/CodexMeter-0.1.0.dmg
 - `CodexMeter.app`
 - `Applications`快捷方式
 - `首次打开说明.txt`
+- 自定义背景图和固定图标布局
 
 用户需要把App拖到Applications，并通过右键`打开`绕过首次Gatekeeper提示。
 
@@ -90,6 +92,7 @@ xcrun stapler validate dist/CodexMeter-0.1.0.dmg
 ```bash
 spctl --assess --type execute --verbose .build/CodexMeter.app
 spctl --assess --type open --context context:primary-signature --verbose dist/CodexMeter-0.1.0.dmg
+cat dist/CodexMeter-0.1.0.dmg.sha256
 ```
 
 如果输出里出现`override=security disabled`，说明本机Gatekeeper处于关闭或覆盖状态，这个结果不能证明陌生机器会直接放行。正式结论应以Developer ID签名、公证、staple和一台Gatekeeper开启的干净Mac验证为准。
@@ -100,3 +103,17 @@ spctl --assess --type open --context context:primary-signature --verbose dist/Co
 - 已安装并登录Codex，且存在`~/.codex/auth.json`。
 - 网络可访问`chatgpt.com/backend-api/wham/usage`。
 - 首次运行后，如果移动App位置，需要重新勾选`开机自启`，让LaunchAgent指向新的可执行文件路径。
+
+## 7.Release脚本
+
+生成产物和Release说明：
+
+```bash
+bash scripts/release.sh
+```
+
+直接更新或创建GitHub Release：
+
+```bash
+bash scripts/release.sh --publish
+```
