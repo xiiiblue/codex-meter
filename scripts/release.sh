@@ -3,12 +3,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PRODUCT_NAME="CodexMeter"
-VERSION="$(sed -n 's/^VERSION="\([^"]*\)"/\1/p' "$ROOT_DIR/scripts/build-app.sh" | head -n 1)"
+VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
 DIST_DIR="$ROOT_DIR/dist"
 DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}.dmg"
 SHA_PATH="$DMG_PATH.sha256"
 NOTES_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}-release-notes.md"
 PUBLISH="false"
+FORCE="false"
 REPO="xiiiblue/codex-meter"
 
 usage() {
@@ -16,7 +17,8 @@ usage() {
 Usage: scripts/release.sh [options]
 
 Options:
-  --publish   Create or update the GitHub Release after building assets.
+  --publish   Create the GitHub Release after building assets.
+  --force     Allow overwriting an existing GitHub Release asset. Only valid with --publish.
   -h, --help  Show this help.
 USAGE
 }
@@ -25,6 +27,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --publish)
       PUBLISH="true"
+      shift
+      ;;
+    --force)
+      FORCE="true"
       shift
       ;;
     -h|--help)
@@ -38,6 +44,19 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ "$FORCE" == "true" && "$PUBLISH" != "true" ]]; then
+  echo "--force only applies with --publish" >&2
+  exit 2
+fi
+
+if [[ "$PUBLISH" == "true" ]]; then
+  TAG="v${VERSION}"
+  if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1 && [[ "$FORCE" != "true" ]]; then
+    echo "Release $TAG already exists. Bump VERSION or rerun with --force to overwrite assets." >&2
+    exit 1
+  fi
+fi
 
 bash "$ROOT_DIR/scripts/build-app.sh" --universal --sign-identity auto --dmg
 

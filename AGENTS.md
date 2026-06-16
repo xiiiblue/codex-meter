@@ -14,8 +14,9 @@
 - 刷新策略：启动立即刷新；菜单提供手动刷新和刷新频率选择，频率保存到`UserDefaults`，默认5分钟。
 - 开机自启：菜单中的`开机自启`会创建或删除用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`，ProgramArguments指向当前App可执行文件。
 - 验证命令：`swift run CodexMeter --once`可无GUI拉取并打印剩余额度；`bash scripts/build-app.sh`可生成`.build/CodexMeter.app`。
-- 分发打包：`bash scripts/build-app.sh --universal --sign-identity auto --dmg`会构建Universal Binary、自动选择签名身份并生成`dist/CodexMeter-0.1.0.dmg`；没有`Developer ID Application`证书时会退回ad-hoc签名，不能替代Apple公证。
-- 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会同步更新GitHub Release。
+- 分发打包：`bash scripts/build-app.sh --universal --sign-identity auto --dmg`会构建Universal Binary、自动选择签名身份并按`VERSION`生成`dist/CodexMeter-版本号.dmg`；没有`Developer ID Application`证书时会退回ad-hoc签名，不能替代Apple公证。
+- 版本管理：版本号统一来自`VERSION`；发布新版本前用`scripts/bump-version.sh patch|minor|major`递增。
+- 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会创建GitHub Release；同版本Release已存在时默认拒绝覆盖，确认重发时使用`--force`。
 - 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
 
 ## 后续交接注意

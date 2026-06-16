@@ -45,8 +45,8 @@ bash scripts/build-app.sh --universal --sign-identity auto --dmg
 输出：
 
 ```text
-dist/CodexMeter-0.1.0.dmg
-dist/CodexMeter-0.1.0.dmg.sha256
+dist/CodexMeter-$(cat VERSION).dmg
+dist/CodexMeter-$(cat VERSION).dmg.sha256
 ```
 
 未公证分发时，DMG会包含：
@@ -91,8 +91,8 @@ xcrun stapler validate dist/CodexMeter-0.1.0.dmg
 
 ```bash
 spctl --assess --type execute --verbose .build/CodexMeter.app
-spctl --assess --type open --context context:primary-signature --verbose dist/CodexMeter-0.1.0.dmg
-cat dist/CodexMeter-0.1.0.dmg.sha256
+spctl --assess --type open --context context:primary-signature --verbose "dist/CodexMeter-$(cat VERSION).dmg"
+cat "dist/CodexMeter-$(cat VERSION).dmg.sha256"
 ```
 
 如果输出里出现`override=security disabled`，说明本机Gatekeeper处于关闭或覆盖状态，这个结果不能证明陌生机器会直接放行。正式结论应以Developer ID签名、公证、staple和一台Gatekeeper开启的干净Mac验证为准。
@@ -106,6 +106,12 @@ cat dist/CodexMeter-0.1.0.dmg.sha256
 
 ## 7.Release脚本
 
+版本号统一来自`VERSION`文件。发布新版本前先递增版本：
+
+```bash
+scripts/bump-version.sh patch
+```
+
 生成产物和Release说明：
 
 ```bash
@@ -116,4 +122,10 @@ bash scripts/release.sh
 
 ```bash
 bash scripts/release.sh --publish
+```
+
+如果同版本Release已经存在，默认会退出，避免覆盖已发布的DMG和SHA256。确认要重发同版本时才使用：
+
+```bash
+bash scripts/release.sh --publish --force
 ```

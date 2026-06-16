@@ -8,7 +8,7 @@ MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
 PRODUCT_NAME="CodexMeter"
 BUNDLE_ID="local.codex-meter"
-VERSION="0.1.0"
+VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
 BUILD_MODE="native"
 SIGN_IDENTITY=""
 CREATE_DMG="false"
@@ -96,23 +96,23 @@ mkdir -p "$RESOURCES_DIR"
 cp "$BUILT_EXECUTABLE" "$MACOS_DIR/$PRODUCT_NAME"
 cp "$ROOT_DIR/Assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 
-cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
+cat > "$CONTENTS_DIR/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>CFBundleExecutable</key>
-  <string>CodexMeter</string>
+  <string>${PRODUCT_NAME}</string>
   <key>CFBundleIdentifier</key>
-  <string>local.codex-meter</string>
+  <string>${BUNDLE_ID}</string>
   <key>CFBundleName</key>
-  <string>CodexMeter</string>
+  <string>${PRODUCT_NAME}</string>
   <key>CFBundleIconFile</key>
   <string>AppIcon</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>0.1.0</string>
+  <string>${VERSION}</string>
   <key>CFBundleVersion</key>
   <string>1</string>
   <key>LSMinimumSystemVersion</key>

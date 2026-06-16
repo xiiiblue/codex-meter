@@ -58,8 +58,8 @@ bash scripts/build-app.sh --universal --sign-identity auto --dmg
 
 ```text
 .build/CodexMeter.app
-dist/CodexMeter-0.1.0.dmg
-dist/CodexMeter-0.1.0.dmg.sha256
+dist/CodexMeter-$(cat VERSION).dmg
+dist/CodexMeter-$(cat VERSION).dmg.sha256
 ```
 
 如果本机没有`Developer ID Application`证书，`--sign-identity auto`会退回ad-hoc签名。ad-hoc签名不等于Apple公证，陌生机器首次打开仍可能被Gatekeeper拦截。正式分发请参考[RELEASE.md](./RELEASE.md)。
@@ -90,11 +90,35 @@ DMG里也包含`首次打开说明.txt`。
 │   ├── AppIcon.png
 │   └── Installer/DmgBackground.png
 ├── Sources/CodexMeter/main.swift
+├── VERSION
 ├── scripts/build-app.sh
+├── scripts/bump-version.sh
 ├── scripts/release.sh
 ├── Package.swift
 ├── README.md
 └── AGENTS.md
+```
+
+## 版本管理
+
+项目版本号统一写在`VERSION`文件中，`build-app.sh`、`release.sh`、`Info.plist`和DMG文件名都会读取它。
+
+发布新版本前先递增版本号：
+
+```bash
+scripts/bump-version.sh patch
+```
+
+递增规则：
+
+- `patch`：修复bug、文档或打包脚本调整，例如`0.1.0 -> 0.1.1`。
+- `minor`：新增用户可见功能，例如`0.1.0 -> 0.2.0`。
+- `major`：稳定版或破坏性变更，例如`0.9.0 -> 1.0.0`。
+
+发布到GitHub时，如果同版本Release已经存在，`scripts/release.sh --publish`会退出，不会覆盖已有资产。确认需要重发同版本时，显式使用：
+
+```bash
+scripts/release.sh --publish --force
 ```
 
 ## 数据来源
@@ -119,10 +143,11 @@ swift run CodexMeter --once
 bash scripts/build-app.sh
 bash scripts/build-app.sh --universal --sign-identity auto --dmg
 bash scripts/release.sh
+scripts/bump-version.sh patch --dry-run
 plutil -lint .build/CodexMeter.app/Contents/Info.plist
 lipo -info .build/CodexMeter.app/Contents/MacOS/CodexMeter
 codesign --verify --deep --strict --verbose=2 .build/CodexMeter.app
-cat dist/CodexMeter-0.1.0.dmg.sha256
+cat "dist/CodexMeter-$(cat VERSION).dmg.sha256"
 ```
 
 ## 注意
