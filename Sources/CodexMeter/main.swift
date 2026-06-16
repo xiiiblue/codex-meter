@@ -128,6 +128,25 @@ enum MeterError: LocalizedError {
             return "接口没有返回额度窗口"
         }
     }
+
+    var guidanceLines: [String]? {
+        switch self {
+        case .authFileMissing:
+            return [
+                "未检测到Codex登录认证",
+                "请先运行: codex login",
+                "完成登录后点“立即刷新”"
+            ]
+        case .chatGPTAuthRequired:
+            return [
+                "当前不是ChatGPT登录态",
+                "请重新运行: codex login",
+                "登录时选择ChatGPT账号"
+            ]
+        case .invalidResponse, .noRateLimits:
+            return nil
+        }
+    }
 }
 
 @MainActor
@@ -401,11 +420,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
         } else {
             statusItem.button?.title = "Codex !"
-            rebuildMenu(message: error.localizedDescription)
+            rebuildMenu(message: error.localizedDescription, guidance: guidanceLines(for: error))
         }
     }
 
-    private func rebuildMenu(snapshot: MeterSnapshot? = nil, message: String? = nil, refreshError: String? = nil) {
+    private func rebuildMenu(
+        snapshot: MeterSnapshot? = nil,
+        message: String? = nil,
+        refreshError: String? = nil,
+        guidance: [String]? = nil
+    ) {
         menu = NSMenu()
 
         if let snapshot {
@@ -422,6 +446,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } else if let message {
             menu.addItem(NSMenuItem(title: message, action: nil, keyEquivalent: ""))
+            if let guidance, !guidance.isEmpty {
+                menu.addItem(.separator())
+                for line in guidance {
+                    menu.addItem(NSMenuItem(title: line, action: nil, keyEquivalent: ""))
+                }
+            }
         }
 
         menu.addItem(.separator())
@@ -503,6 +533,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             rebuildMenu(message: "正在刷新...")
         }
+    }
+
+    private func guidanceLines(for error: Error) -> [String]? {
+        if let meterError = error as? MeterError {
+            return meterError.guidanceLines
+        }
+        return nil
     }
 
     private func showError(_ message: String) {
