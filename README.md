@@ -61,6 +61,17 @@ dist/CodexMeter-0.1.0.dmg
 
 如果本机没有`Developer ID Application`证书，`--sign-identity auto`会退回ad-hoc签名。ad-hoc签名不等于Apple公证，陌生机器首次打开仍可能被Gatekeeper拦截。正式分发请参考[RELEASE.md](./RELEASE.md)。
 
+## 未公证DMG安装
+
+不付费使用Apple Developer Program时，可以分发未公证DMG。用户安装步骤：
+
+1. 打开`CodexMeter-0.1.0.dmg`。
+2. 将`CodexMeter.app`拖到`Applications`。
+3. 第一次按住Control点击或右键点击`CodexMeter.app`，选择`打开`。
+4. 如果macOS提示无法验证开发者，继续选择`打开`；如果仍被阻止，到`系统设置 > 隐私与安全性`中允许打开。
+
+DMG里也包含`首次打开说明.txt`。
+
 ## 选项
 
 - 开机自启：在菜单里勾选`开机自启`后，会写入用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`。

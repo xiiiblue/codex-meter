@@ -48,6 +48,14 @@ bash scripts/build-app.sh --universal --sign-identity auto --dmg
 dist/CodexMeter-0.1.0.dmg
 ```
 
+未公证分发时，DMG会包含：
+
+- `CodexMeter.app`
+- `Applications`快捷方式
+- `首次打开说明.txt`
+
+用户需要把App拖到Applications，并通过右键`打开`绕过首次Gatekeeper提示。
+
 ## 4.公证
 
 公证需要：

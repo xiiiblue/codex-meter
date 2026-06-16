@@ -13,6 +13,7 @@ BUILD_MODE="native"
 SIGN_IDENTITY=""
 CREATE_DMG="false"
 DIST_DIR="$ROOT_DIR/dist"
+DMG_STAGING_DIR="$ROOT_DIR/.build/dmg-root"
 
 usage() {
   cat <<USAGE
@@ -132,9 +133,23 @@ if [[ "$CREATE_DMG" == "true" ]]; then
   mkdir -p "$DIST_DIR"
   DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}.dmg"
   rm -f "$DMG_PATH"
+  rm -rf "$DMG_STAGING_DIR"
+  mkdir -p "$DMG_STAGING_DIR"
+  cp -R "$APP_DIR" "$DMG_STAGING_DIR/$PRODUCT_NAME.app"
+  ln -s /Applications "$DMG_STAGING_DIR/Applications"
+  cat > "$DMG_STAGING_DIR/首次打开说明.txt" <<'NOTE'
+CodexMeter未公证版首次打开说明
+
+1. 将CodexMeter.app拖到Applications。
+2. 第一次不要直接双击，按住Control点击或右键点击CodexMeter.app，选择“打开”。
+3. 如果macOS提示无法验证开发者，继续选择“打开”。
+4. 如果仍被阻止，打开“系统设置 > 隐私与安全性”，在安全提示中允许打开。
+
+使用前请确认本机已经登录Codex，并存在~/.codex/auth.json。
+NOTE
   hdiutil create \
     -volname "$PRODUCT_NAME" \
-    -srcfolder "$APP_DIR" \
+    -srcfolder "$DMG_STAGING_DIR" \
     -ov \
     -format UDZO \
     "$DMG_PATH"
