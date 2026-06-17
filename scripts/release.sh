@@ -93,29 +93,29 @@ SHA_LINE="$(cat "$SHA_PATH")"
 cat > "$NOTES_PATH" <<NOTES
 ## ${PRODUCT_NAME} ${VERSION}
 
-macOS菜单栏Codex额度指示器，显示日限额和周限额剩余百分比。
+Native macOS menu bar quota indicator for Codex. It shows the remaining daily and weekly quota percentages.
 
-### 产物
+### Assets
 
-- DMG：$(basename "$DMG_PATH")
-- SHA256：\`$SHA_LINE\`
+- DMG: $(basename "$DMG_PATH")
+- SHA256: \`$SHA_LINE\`
 
-### 安装
+### Install
 
-1. 下载并打开\`$(basename "$DMG_PATH")\`。
-2. 将\`${PRODUCT_NAME}.app\`拖到\`Applications\`。
-3. 首次启动请按住Control点击或右键点击\`${PRODUCT_NAME}.app\`，选择“打开”。
-4. 如果macOS提示无法验证开发者，继续选择“打开”；如果仍被阻止，到“系统设置 > 隐私与安全性”中允许打开。
+1. Download and open \`$(basename "$DMG_PATH")\`.
+2. Drag \`${PRODUCT_NAME}.app\` to \`Applications\`.
+3. On first launch, Control-click or right-click \`${PRODUCT_NAME}.app\`, then choose \`Open\`.
+4. If macOS says the developer cannot be verified, choose \`Open\` again. If it is still blocked, allow it in \`System Settings > Privacy & Security\`.
 
-### 使用前提
+### Requirements
 
-- macOS14或更高版本。
-- 已在本机Codex中通过ChatGPT登录，并存在\`~/.codex/auth.json\`。
-- 网络可访问ChatGPT后端额度接口。
+- macOS 14 or later.
+- Codex has already signed in with ChatGPT on this Mac, and \`~/.codex/auth.json\` exists.
+- The network can access the ChatGPT backend usage endpoint.
 
-### 分发说明
+### Distribution Notes
 
-这是未公证版DMG，可能使用ad-hoc签名。陌生机器首次打开可能出现Gatekeeper提示。
+This is an unnotarized DMG and may use ad-hoc signing. Gatekeeper may show a warning on first launch on another Mac.
 NOTES
 
 if [[ "$PUBLISH" == "true" ]]; then

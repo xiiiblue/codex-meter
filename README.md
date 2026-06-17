@@ -76,7 +76,7 @@ If you do not pay for the Apple Developer Program, you can distribute an unnotar
 3. On first launch, Control-click or right-click `CodexMeter.app`, then choose `Open`.
 4. If macOS says the developer cannot be verified, choose `Open` again. If it is still blocked, allow it in `System Settings > Privacy & Security`.
 
-The DMG also includes `首次打开说明.txt`.
+The DMG also includes `First Open Guide.txt`.
 
 ## Options
 

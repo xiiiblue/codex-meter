@@ -177,15 +177,15 @@ if [[ "$CREATE_DMG" == "true" ]]; then
   cp -R "$APP_DIR" "$DMG_STAGING_DIR/$PRODUCT_NAME.app"
   ln -s /Applications "$DMG_STAGING_DIR/Applications"
   cp "$DMG_BACKGROUND_SOURCE" "$DMG_STAGING_DIR/.background/background.png"
-  cat > "$DMG_STAGING_DIR/首次打开说明.txt" <<'NOTE'
-CodexMeter未公证版首次打开说明
+  cat > "$DMG_STAGING_DIR/First Open Guide.txt" <<'NOTE'
+CodexMeter Unnotarized First Open Guide
 
-1. 将CodexMeter.app拖到Applications。
-2. 第一次不要直接双击，按住Control点击或右键点击CodexMeter.app，选择“打开”。
-3. 如果macOS提示无法验证开发者，继续选择“打开”。
-4. 如果仍被阻止，打开“系统设置 > 隐私与安全性”，在安全提示中允许打开。
+1. Drag CodexMeter.app to Applications.
+2. Do not double-click it the first time. Control-click or right-click CodexMeter.app, then choose Open.
+3. If macOS says the developer cannot be verified, choose Open again.
+4. If it is still blocked, open System Settings > Privacy & Security and allow it from the security prompt.
 
-使用前请确认本机已经登录Codex，并存在~/.codex/auth.json。
+Before using the app, make sure Codex has already signed in on this Mac and ~/.codex/auth.json exists.
 NOTE
   hdiutil create \
     -volname "$PRODUCT_NAME" \
@@ -220,7 +220,7 @@ tell application "Finder"
     set background picture of theViewOptions to file ".background:background.png"
     set position of item "${PRODUCT_NAME}.app" of container window to ${DMG_APP_POSITION}
     set position of item "Applications" of container window to ${DMG_APPLICATIONS_POSITION}
-    set position of item "首次打开说明.txt" of container window to ${DMG_GUIDE_POSITION}
+    set position of item "First Open Guide.txt" of container window to ${DMG_GUIDE_POSITION}
     close
     open
     update without registering applications

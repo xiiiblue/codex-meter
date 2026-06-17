@@ -53,7 +53,7 @@ dist/CodexMeter-$(cat VERSION).dmg.sha256
 
 - `CodexMeter.app`
 - `Applications`快捷方式
-- `首次打开说明.txt`
+- `First Open Guide.txt`
 - 自定义背景图和固定图标布局
 
 用户需要把App拖到Applications，并通过右键`打开`绕过首次Gatekeeper提示。

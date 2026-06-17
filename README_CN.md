@@ -76,7 +76,7 @@ dist/CodexMeter-$(cat VERSION).dmg.sha256
 3. 第一次按住Control点击或右键点击`CodexMeter.app`，选择`打开`。
 4. 如果macOS提示无法验证开发者，继续选择`打开`；如果仍被阻止，到`系统设置 > 隐私与安全性`中允许打开。
 
-DMG里也包含`首次打开说明.txt`。
+DMG里也包含`First Open Guide.txt`。
 
 ## 选项
 
