@@ -1,6 +1,17 @@
 import Foundation
 
 enum L {
+    static var locale: Locale {
+        switch Preferences.appLanguage {
+        case .system:
+            return Locale.current
+        case .zhHans:
+            return Locale(identifier: "zh_Hans")
+        case .en:
+            return Locale(identifier: "en")
+        }
+    }
+
     static func text(_ key: String) -> String {
         for bundle in localizedBundles() {
             let value = bundle.localizedString(forKey: key, value: key, table: nil)
@@ -12,7 +23,7 @@ enum L {
     }
 
     static func format(_ key: String, _ arguments: CVarArg...) -> String {
-        String(format: text(key), locale: Locale.current, arguments: arguments)
+        String(format: text(key), locale: locale, arguments: arguments)
     }
 
     private static func localizedBundles() -> [Bundle] {
@@ -33,6 +44,15 @@ enum L {
     }
 
     private static func preferredLocalizations() -> [String] {
+        switch Preferences.appLanguage {
+        case .system:
+            break
+        case .zhHans:
+            return ["zh-Hans", "en"]
+        case .en:
+            return ["en"]
+        }
+
         let preferences = UserDefaults.standard.stringArray(forKey: "AppleLanguages") ?? Locale.preferredLanguages
         var result: [String] = []
         for language in preferences {

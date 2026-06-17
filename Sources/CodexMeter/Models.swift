@@ -59,7 +59,7 @@ struct UsageResponse: Decodable {
 }
 
 struct LimitSnapshot {
-    let title: String
+    let titleKey: String
     let remainingPercent: Int
     let resetAt: Date?
 }

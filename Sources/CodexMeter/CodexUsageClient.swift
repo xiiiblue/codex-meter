@@ -50,8 +50,8 @@ final class CodexUsageClient {
         }
 
         let usage = try JSONDecoder().decode(UsageResponse.self, from: data)
-        let primary = snapshot(title: L.text("limit.day"), window: usage.rateLimit.primaryWindow)
-        let secondary = snapshot(title: L.text("limit.week"), window: usage.rateLimit.secondaryWindow)
+        let primary = snapshot(titleKey: "limit.day", window: usage.rateLimit.primaryWindow)
+        let secondary = snapshot(titleKey: "limit.week", window: usage.rateLimit.secondaryWindow)
         guard primary != nil || secondary != nil else {
             throw MeterError.noRateLimits
         }
@@ -64,13 +64,13 @@ final class CodexUsageClient {
         )
     }
 
-    private func snapshot(title: String, window: UsageResponse.RateLimit.Window?) -> LimitSnapshot? {
+    private func snapshot(titleKey: String, window: UsageResponse.RateLimit.Window?) -> LimitSnapshot? {
         guard let window else {
             return nil
         }
 
         let remaining = max(0, min(100, Int((100 - window.usedPercent).rounded())))
         let resetAt = window.resetAt.map { Date(timeIntervalSince1970: $0) }
-        return LimitSnapshot(title: title, remainingPercent: remaining, resetAt: resetAt)
+        return LimitSnapshot(titleKey: titleKey, remainingPercent: remaining, resetAt: resetAt)
     }
 }

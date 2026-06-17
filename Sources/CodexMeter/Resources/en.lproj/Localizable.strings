@@ -17,6 +17,9 @@
 "guidance.chatGPTRequired.1" = "Current auth is not a ChatGPT session";
 "guidance.chatGPTRequired.2" = "Run again: codex login";
 "guidance.chatGPTRequired.3" = "Choose a ChatGPT account when logging in";
+"language.english" = "English";
+"language.system" = "System";
+"language.zhHans" = "Simplified Chinese";
 "limit.day" = "Daily limit";
 "limit.menuLine" = "%@: %d%% remaining%@";
 "limit.resetSuffix" = ", resets: %@ (%@)";
@@ -26,6 +29,7 @@
 "menu.failureReason" = "Reason: %@";
 "menu.lastRefreshFailed" = "Last refresh failed: %@";
 "menu.lastSuccessfulRefresh" = "Last successful refresh: %@";
+"menu.language" = "Language";
 "menu.launchAtLogin" = "Launch at login";
 "menu.loginItemPathExpired" = "Launch at login path expired";
 "menu.nextRefresh" = "Next refresh: %@";

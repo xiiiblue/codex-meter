@@ -8,7 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var timer: Timer?
     private var client: CodexUsageClient!
     private var latestSnapshot: MeterSnapshot?
-    private var latestRefreshError: String?
+    private var latestRefreshError: Error?
     private var latestRefreshErrorAt: Date?
     private let authPath = NSString(string: "~/.codex/auth.json").expandingTildeInPath
 
@@ -53,20 +53,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func render(_ error: Error) {
-        latestRefreshError = error.localizedDescription
+        latestRefreshError = error
         latestRefreshErrorAt = Date()
         if let latestSnapshot {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
         } else {
             statusItem.button?.title = "Codex !"
-            rebuildMenu(message: error.localizedDescription, guidance: guidanceLines(for: error))
+            rebuildMenu(message: errorMessage(error), guidance: guidanceLines(for: error))
         }
     }
 
     private func rebuildMenu(
         snapshot: MeterSnapshot? = nil,
         message: String? = nil,
-        refreshError: String? = nil,
+        refreshError: Error? = nil,
         guidance: [String]? = nil
     ) {
         menu = NSMenu()
@@ -93,7 +93,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 menu.addItem(.separator())
                 let failedAt = latestRefreshErrorAt.map(format) ?? L.text("time.unknown")
                 menu.addItem(NSMenuItem(title: L.format("menu.lastRefreshFailed", failedAt), action: nil, keyEquivalent: ""))
-                menu.addItem(NSMenuItem(title: L.format("menu.failureReason", refreshError), action: nil, keyEquivalent: ""))
+                menu.addItem(NSMenuItem(title: L.format("menu.failureReason", errorMessage(refreshError)), action: nil, keyEquivalent: ""))
             }
         } else if let message {
             menu.addItem(NSMenuItem(title: message, action: nil, keyEquivalent: ""))
@@ -161,6 +161,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         displayModeItem.submenu = displayModeMenu
         menu.addItem(displayModeItem)
+
+        let currentLanguage = Preferences.appLanguage
+        let languageItem = NSMenuItem(title: L.text("menu.language"), action: nil, keyEquivalent: "")
+        let languageMenu = NSMenu()
+        for language in AppLanguage.allCases {
+            let item = NSMenuItem(title: language.title, action: #selector(setLanguage), keyEquivalent: "")
+            item.target = self
+            item.representedObject = language.rawValue
+            item.state = language == currentLanguage ? .on : .off
+            languageMenu.addItem(item)
+        }
+        languageItem.submenu = languageMenu
+        menu.addItem(languageItem)
     }
 
     private func addLimitItem(_ limit: LimitSnapshot?) {
@@ -169,7 +182,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let reset = limit.resetAt.map { L.format("limit.resetSuffix", format($0), relativeTimeDescription(until: $0)) } ?? ""
-        menu.addItem(NSMenuItem(title: L.format("limit.menuLine", limit.title, limit.remainingPercent, reset), action: nil, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: L.format("limit.menuLine", L.text(limit.titleKey), limit.remainingPercent, reset), action: nil, keyEquivalent: ""))
     }
 
     private func lowQuotaWarnings(for snapshot: MeterSnapshot) -> [String] {
@@ -178,10 +191,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return nil
             }
             if limit.remainingPercent <= 10 {
-                return L.format("quota.critical", limit.title, limit.remainingPercent)
+                return L.format("quota.critical", L.text(limit.titleKey), limit.remainingPercent)
             }
             if limit.remainingPercent <= 20 {
-                return L.format("quota.low", limit.title, limit.remainingPercent)
+                return L.format("quota.low", L.text(limit.titleKey), limit.remainingPercent)
             }
             return nil
         }
@@ -205,7 +218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func format(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale.current
+        formatter.locale = L.locale
         formatter.dateStyle = .short
         formatter.timeStyle = .short
         return formatter.string(from: date)
@@ -256,9 +269,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func setLanguage(_ sender: NSMenuItem) {
+        guard let rawValue = sender.representedObject as? String,
+              let language = AppLanguage(rawValue: rawValue) else {
+            return
+        }
+        Preferences.appLanguage = language
+        if let latestSnapshot {
+            render(latestSnapshot)
+        } else {
+            rebuildCurrentMenu()
+        }
+    }
+
     private func rebuildCurrentMenu() {
         if let latestSnapshot {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
+        } else if let latestRefreshError {
+            rebuildMenu(message: errorMessage(latestRefreshError), guidance: guidanceLines(for: latestRefreshError))
         } else {
             rebuildMenu(message: L.text("status.refreshing"))
         }
@@ -269,6 +297,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return meterError.guidanceLines
         }
         return nil
+    }
+
+    private func errorMessage(_ error: Error) -> String {
+        if let localizedError = error as? LocalizedError,
+           let description = localizedError.errorDescription {
+            return description
+        }
+        return error.localizedDescription
     }
 
     private func isLaunchAtLoginEnabled(_ status: LoginItemManager.Status) -> Bool {

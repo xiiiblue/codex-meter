@@ -43,9 +43,27 @@ enum DisplayMode: String, CaseIterable {
     }
 }
 
+enum AppLanguage: String, CaseIterable {
+    case system
+    case zhHans = "zh-Hans"
+    case en
+
+    var title: String {
+        switch self {
+        case .system:
+            return L.text("language.system")
+        case .zhHans:
+            return L.text("language.zhHans")
+        case .en:
+            return L.text("language.english")
+        }
+    }
+}
+
 enum Preferences {
     private static let refreshIntervalKey = "refreshIntervalSeconds"
     private static let displayModeKey = "displayMode"
+    private static let appLanguageKey = "appLanguage"
 
     static var refreshIntervalSeconds: TimeInterval {
         get {
@@ -70,6 +88,19 @@ enum Preferences {
         }
         set {
             UserDefaults.standard.set(newValue.rawValue, forKey: displayModeKey)
+        }
+    }
+
+    static var appLanguage: AppLanguage {
+        get {
+            guard let rawValue = UserDefaults.standard.string(forKey: appLanguageKey),
+                  let language = AppLanguage(rawValue: rawValue) else {
+                return .system
+            }
+            return language
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: appLanguageKey)
         }
     }
 }
