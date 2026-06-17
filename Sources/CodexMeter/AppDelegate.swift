@@ -82,9 +82,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
             menu.addItem(.separator())
-            if let planType = snapshot.planType {
-                menu.addItem(NSMenuItem(title: L.format("menu.subscription", planType), action: nil, keyEquivalent: ""))
-            }
             menu.addItem(NSMenuItem(title: L.format("menu.lastSuccessfulRefresh", format(snapshot.refreshedAt)), action: nil, keyEquivalent: ""))
             if let nextRefreshAt = timer?.fireDate {
                 menu.addItem(NSMenuItem(title: L.format("menu.nextRefresh", format(nextRefreshAt)), action: nil, keyEquivalent: ""))
@@ -110,7 +107,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         refreshItem.target = self
         menu.addItem(refreshItem)
         addSettingsItems()
-        menu.addItem(NSMenuItem(title: L.format("menu.authFile", authPath), action: nil, keyEquivalent: ""))
         menu.addItem(.separator())
         let quitItem = NSMenuItem(title: L.text("menu.quit"), action: #selector(quit), keyEquivalent: "q")
         quitItem.target = self

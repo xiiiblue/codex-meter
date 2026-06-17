@@ -29,7 +29,6 @@
 "limit.menuLine" = "%@: %d%% remaining%@";
 "limit.resetSuffix" = ", resets: %@ (%@)";
 "limit.week" = "Weekly limit";
-"menu.authFile" = "Auth file: %@";
 "menu.displayMode" = "Display mode";
 "menu.failureReason" = "Reason: %@";
 "menu.lastRefreshFailed" = "Last refresh failed: %@";
@@ -42,7 +41,6 @@
 "menu.refreshInterval" = "Refresh interval";
 "menu.refreshNow" = "Refresh Now";
 "menu.repairLoginItemPath" = "Repair launch at login path";
-"menu.subscription" = "Plan: %@";
 "path.unknown" = "Unknown path";
 "quota.critical" = "%@ critical: only %d%% left";
 "quota.low" = "%@ low: %d%% remaining";

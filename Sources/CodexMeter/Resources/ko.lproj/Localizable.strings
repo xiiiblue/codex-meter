@@ -29,7 +29,6 @@
 "limit.menuLine" = "%@:남은 %d%%%@";
 "limit.resetSuffix" = ", 재설정:%@(%@)";
 "limit.week" = "주간 한도";
-"menu.authFile" = "인증 파일:%@";
 "menu.displayMode" = "표시 모드";
 "menu.failureReason" = "원인:%@";
 "menu.lastRefreshFailed" = "마지막 새로 고침 실패:%@";
@@ -42,7 +41,6 @@
 "menu.refreshInterval" = "새로 고침 간격";
 "menu.refreshNow" = "지금 새로 고침";
 "menu.repairLoginItemPath" = "로그인 시 실행 경로 복구";
-"menu.subscription" = "플랜:%@";
 "path.unknown" = "알 수 없는 경로";
 "quota.critical" = "%@ 위험:남은 %d%%";
 "quota.low" = "%@ 낮음:남은 %d%%";

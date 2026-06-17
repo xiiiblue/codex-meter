@@ -29,7 +29,6 @@
 "limit.menuLine" = "%@: %d%% restante%@";
 "limit.resetSuffix" = ", se restablece: %@ (%@)";
 "limit.week" = "Límite semanal";
-"menu.authFile" = "Archivo de autenticación: %@";
 "menu.displayMode" = "Modo de visualización";
 "menu.failureReason" = "Motivo: %@";
 "menu.lastRefreshFailed" = "Última actualización fallida: %@";
@@ -42,7 +41,6 @@
 "menu.refreshInterval" = "Intervalo de actualización";
 "menu.refreshNow" = "Actualizar ahora";
 "menu.repairLoginItemPath" = "Reparar ruta de inicio";
-"menu.subscription" = "Plan: %@";
 "path.unknown" = "Ruta desconocida";
 "quota.critical" = "%@ crítico: solo queda %d%%";
 "quota.low" = "%@ bajo: queda %d%%";

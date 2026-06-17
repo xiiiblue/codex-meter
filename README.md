@@ -10,7 +10,7 @@ CodexMeter is a small native macOS menu bar utility for checking Codex quota at 
 
 - Shows `Dxx% Wxx%` directly in the menu bar, visible at a glance without opening the menu.
 - Supports menu bar display modes: standard, compact, lowest quota only, and daily quota only.
-- Shows daily quota, weekly quota, reset times, subscription type, and latest refresh time in the menu.
+- Shows daily quota, weekly quota, reset times, and latest refresh time in the menu.
 - Supports manual refresh.
 - Supports launch at login.
 - Supports configurable refresh intervals: `1 minute`, `5 minutes`, `15 minutes`, `30 minutes`, and `60 minutes`.
@@ -35,7 +35,7 @@ The menu bar will show:
 D45% W35%
 ```
 
-The menu includes manual refresh, launch at login, refresh interval, subscription type, refresh time, and quota reset times.
+The menu includes manual refresh, launch at login, refresh interval, refresh time, and quota reset times.
 
 You can also run a headless one-shot verification first:
 

@@ -29,7 +29,6 @@
 "limit.menuLine" = "%@:剩余%d%%%@";
 "limit.resetSuffix" = "，重置:%@（%@）";
 "limit.week" = "周限额";
-"menu.authFile" = "认证文件:%@";
 "menu.displayMode" = "显示模式";
 "menu.failureReason" = "失败原因:%@";
 "menu.lastRefreshFailed" = "上次刷新失败:%@";
@@ -42,7 +41,6 @@
 "menu.refreshInterval" = "刷新频率";
 "menu.refreshNow" = "立即刷新";
 "menu.repairLoginItemPath" = "修复开机自启路径";
-"menu.subscription" = "订阅:%@";
 "path.unknown" = "未知路径";
 "quota.critical" = "%@额度告急:仅剩%d%%";
 "quota.low" = "%@额度偏低:剩余%d%%";

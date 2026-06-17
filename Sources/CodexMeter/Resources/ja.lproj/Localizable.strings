@@ -29,7 +29,6 @@
 "limit.menuLine" = "%@:残り%d%%%@";
 "limit.resetSuffix" = "、リセット:%@（%@）";
 "limit.week" = "週次制限";
-"menu.authFile" = "認証ファイル:%@";
 "menu.displayMode" = "表示モード";
 "menu.failureReason" = "理由:%@";
 "menu.lastRefreshFailed" = "前回の更新失敗:%@";
@@ -42,7 +41,6 @@
 "menu.refreshInterval" = "更新間隔";
 "menu.refreshNow" = "今すぐ更新";
 "menu.repairLoginItemPath" = "ログイン時起動のパスを修復";
-"menu.subscription" = "プラン:%@";
 "path.unknown" = "不明なパス";
 "quota.critical" = "%@が危険です:残り%d%%";
 "quota.low" = "%@が低下しています:残り%d%%";
