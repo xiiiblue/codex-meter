@@ -1,7 +1,5 @@
 # CodexMeter
 
-[中文](./README_CN.md)
-
 CodexMeter is a native macOS menu bar utility that reads the current machine's Codex login state, fetches Codex usage for the ChatGPT account, and shows the remaining daily and weekly quota percentages directly in the menu bar.
 
 ## Features
@@ -83,7 +81,7 @@ The DMG also includes `First Open Guide.txt`.
 - Launch at login: checking `Launch at Login` in the menu writes a user-level LaunchAgent at `~/Library/LaunchAgents/local.codex-meter.plist`.
 - Refresh interval: the menu offers `1 minute`, `5 minutes`, `15 minutes`, `30 minutes`, and `60 minutes`. The selected value is saved to `UserDefaults` and immediately rebuilds the refresh timer.
 - Display mode: the menu can switch between `D24% W32%`, `D24 W32`, `Codex 24%`, and daily quota only.
-- Language: the menu offers `System`, `简体中文`, `English`, `日本語`, `한국어`, `Español`, `Français`, and `Deutsch`. The selected value is saved to `UserDefaults` and takes effect immediately.
+- Language: the menu offers System, Simplified Chinese, English, Japanese, Korean, Spanish, French, and German. The selected value is saved to `UserDefaults` and takes effect immediately.
 
 ## Project Structure
 
@@ -116,7 +114,6 @@ The DMG also includes `First Open Guide.txt`.
 ├── scripts/release.sh
 ├── Package.swift
 ├── README.md
-├── README_CN.md
 └── AGENTS.md
 ```
 

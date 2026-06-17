@@ -1,78 +1,78 @@
-# CodexMeter发布说明
+# CodexMeter Release Notes
 
-本文档记录把CodexMeter打包给其他Mac用户使用时需要做的步骤。
+This document records the steps required to package CodexMeter for other Mac users.
 
-## 1.构建Universal Binary
+## 1. Build a Universal Binary
 
 ```bash
 bash scripts/build-app.sh --universal
 lipo -info .build/CodexMeter.app/Contents/MacOS/CodexMeter
 ```
 
-期望输出包含：
+Expected output includes:
 
 ```text
 x86_64 arm64
 ```
 
-## 2.签名
+## 2. Sign
 
-自动选择签名身份：
+Automatically select a signing identity:
 
 ```bash
 bash scripts/build-app.sh --universal --sign-identity auto
 ```
 
-行为：
+Behavior:
 
-- 如果钥匙串里存在`Developer ID Application`证书，会用它签名并开启hardened runtime。
-- 如果没有`Developer ID Application`证书，会退回ad-hoc签名`-`。
+- If the keychain contains a `Developer ID Application` certificate, the script signs with it and enables the hardened runtime.
+- If no `Developer ID Application` certificate exists, the script falls back to ad-hoc signing with `-`.
 
-检查当前可用证书：
+Check available signing certificates:
 
 ```bash
 security find-identity -v -p codesigning
 ```
 
-当前机器只有`Apple Development`证书时，可以本机开发签名，但不适合对外分发。对外分发需要Apple Developer账号里的`Developer ID Application`证书。
+If this machine only has an `Apple Development` certificate, it can be used for local development signing, but it is not suitable for external distribution. External distribution requires a `Developer ID Application` certificate from an Apple Developer account.
 
-## 3.生成DMG
+## 3. Generate the DMG
 
 ```bash
 bash scripts/build-app.sh --universal --sign-identity auto --dmg
 ```
 
-输出：
+Output:
 
 ```text
 dist/CodexMeter-$(cat VERSION).dmg
 dist/CodexMeter-$(cat VERSION).dmg.sha256
 ```
 
-未公证分发时，DMG会包含：
+For unnotarized distribution, the DMG contains:
 
 - `CodexMeter.app`
-- `Applications`快捷方式
+- `Applications` shortcut
 - `First Open Guide.txt`
-- 自定义背景图和固定图标布局
+- Custom background image and fixed icon layout
 
-用户需要把App拖到Applications，并通过右键`打开`绕过首次Gatekeeper提示。
+Users need to drag the app to Applications and use right-click `Open` to bypass the first Gatekeeper prompt.
 
-## 4.公证
+## 4. Notarize
 
-公证需要：
+Notarization requires:
 
-- `Developer ID Application`证书。
-- Apple Developer账号。
-- App Store Connect APIKey，或已保存到Keychain的notarytool配置。
+- A `Developer ID Application` certificate.
+- An Apple Developer account.
+- An App Store Connect API key, or a notarytool profile already saved in Keychain.
 
-保存公证凭据：
+Save notarization credentials:
 
 ```bash
 xcrun notarytool store-credentials codex-meter-notary
 ```
 
-提交DMG：
+Submit the DMG:
 
 ```bash
 xcrun notarytool submit "dist/CodexMeter-$(cat VERSION).dmg" \
@@ -80,14 +80,14 @@ xcrun notarytool submit "dist/CodexMeter-$(cat VERSION).dmg" \
   --wait
 ```
 
-公证成功后装订：
+After notarization succeeds, staple and validate:
 
 ```bash
 xcrun stapler staple "dist/CodexMeter-$(cat VERSION).dmg"
 xcrun stapler validate "dist/CodexMeter-$(cat VERSION).dmg"
 ```
 
-## 5.分发前验证
+## 5. Pre-distribution Verification
 
 ```bash
 spctl --assess --type execute --verbose .build/CodexMeter.app
@@ -95,42 +95,42 @@ spctl --assess --type open --context context:primary-signature --verbose "dist/C
 cat "dist/CodexMeter-$(cat VERSION).dmg.sha256"
 ```
 
-如果输出里出现`override=security disabled`，说明本机Gatekeeper处于关闭或覆盖状态，这个结果不能证明陌生机器会直接放行。正式结论应以Developer ID签名、公证、staple和一台Gatekeeper开启的干净Mac验证为准。
+If the output contains `override=security disabled`, Gatekeeper is disabled or overridden on this Mac. That result does not prove another Mac will allow the app. A formal distribution check should use Developer ID signing, notarization, stapling, and a clean Mac with Gatekeeper enabled.
 
-## 6.使用者机器要求
+## 6. User Machine Requirements
 
-- macOS14或更高版本。
-- 已安装并登录Codex，且存在`~/.codex/auth.json`。
-- 网络可访问`chatgpt.com/backend-api/wham/usage`。
-- 首次运行后，如果移动App位置，需要重新勾选`开机自启`，让LaunchAgent指向新的可执行文件路径。
+- macOS 14 or later.
+- Codex is installed and signed in, and `~/.codex/auth.json` exists.
+- The network can access `chatgpt.com/backend-api/wham/usage`.
+- If the app is moved after first launch, re-enable `Launch at Login` so the LaunchAgent points to the new executable path.
 
-## 7.Release脚本
+## 7. Release Script
 
-版本号统一来自`VERSION`文件。发布新版本前先递增版本：
+The version is read from `VERSION`. Bump the version before publishing a new release:
 
 ```bash
 scripts/bump-version.sh patch
 ```
 
-也可以让Release脚本自动递增版本后发布：
+The release script can also bump the version before publishing:
 
 ```bash
 bash scripts/release.sh --publish --bump patch
 ```
 
-生成产物和Release说明：
+Generate artifacts and release notes:
 
 ```bash
 bash scripts/release.sh
 ```
 
-创建GitHub Release：
+Create a GitHub Release:
 
 ```bash
 bash scripts/release.sh --publish
 ```
 
-如果同版本Release已经存在，默认会退出，避免覆盖已发布的DMG和SHA256。确认要重发同版本时才使用：
+If a Release with the same version already exists, the script exits by default to avoid overwriting published DMG and SHA256 assets. Use this only when intentionally republishing the same version:
 
 ```bash
 bash scripts/release.sh --publish --force

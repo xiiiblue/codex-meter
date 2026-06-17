@@ -1,32 +1,32 @@
-# CodexMeter项目说明
+# CodexMeter Project Notes
 
-## 项目目标
+## Project Goal
 
-构建macOS原生菜单栏应用，直接展示Codex日限额和周限额剩余百分比。
+Build a native macOS menu bar app that directly shows the remaining Codex daily and weekly quota percentages.
 
-## 当前实现
+## Current Implementation
 
-- 技术栈：SwiftPM + AppKit。
-- 入口：`Sources/CodexMeter/main.swift`，只保留命令行`--once`和App启动逻辑。
-- 核心模块：`AppDelegate.swift`负责菜单栏UI，`CodexUsageClient.swift`负责只读认证和额度请求，`LoginItemManager.swift`负责LaunchAgent，`Preferences.swift`负责用户设置，`Models.swift`和`MeterError.swift`负责数据类型和错误提示，`Localizer.swift`负责本地化读取。
-- 认证文件：默认读取`~/.codex/auth.json`。
-- 额度接口：`https://chatgpt.com/backend-api/wham/usage`。
-- 显示逻辑：`primary_window.used_percent`视为日限额已用百分比，`secondary_window.used_percent`视为周限额已用百分比，菜单栏显示`100-used_percent`。
-- 刷新策略：启动立即刷新；菜单提供手动刷新和刷新频率选择，频率保存到`UserDefaults`，默认5分钟。
-- 开机自启：菜单中的`开机自启`会创建或删除用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`，ProgramArguments指向当前App可执行文件。
-- 验证命令：`swift run CodexMeter --once`可无GUI拉取并打印剩余额度；`bash scripts/build-app.sh`可生成`.build/CodexMeter.app`。
-- 分发打包：`bash scripts/build-app.sh --universal --sign-identity auto --dmg`会构建Universal Binary、自动选择签名身份并按`VERSION`生成`dist/CodexMeter-版本号.dmg`；没有`Developer ID Application`证书时会退回ad-hoc签名，不能替代Apple公证。
-- 版本管理：版本号统一来自`VERSION`；发布新版本前用`scripts/bump-version.sh patch|minor|major`递增。
-- 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会创建GitHub Release；同版本Release已存在时默认拒绝覆盖，确认重发时使用`--force`。
-- 发布递增：`bash scripts/release.sh --publish --bump patch`会先递增`VERSION`再发布；同版本重发才使用`--force`。
-- 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
-- 国际化：应用UI文案使用`Sources/CodexMeter/Resources/*.lproj/Localizable.strings`，当前支持`en`、`zh-Hans`、`ja`、`ko`、`es`、`fr`、`de`；打包脚本会复制`.lproj`目录到App资源目录；菜单中可选择跟随系统或固定语言，偏好保存到`UserDefaults`。新增UI文案时必须同步维护全部语言资源，避免菜单显示原始key。
+- Tech stack: SwiftPM + AppKit.
+- Entry point: `Sources/CodexMeter/main.swift`, which only keeps the command-line `--once` flow and app startup logic.
+- Core modules: `AppDelegate.swift` handles menu bar UI, `CodexUsageClient.swift` handles read-only auth and quota requests, `LoginItemManager.swift` handles LaunchAgent integration, `Preferences.swift` handles user settings, `Models.swift` and `MeterError.swift` handle data types and error text, and `Localizer.swift` handles localization lookup.
+- Auth file: reads `~/.codex/auth.json` by default.
+- Usage endpoint: `https://chatgpt.com/backend-api/wham/usage`.
+- Display logic: `primary_window.used_percent` is treated as daily quota usage, `secondary_window.used_percent` is treated as weekly quota usage, and the menu bar shows `100 - used_percent`.
+- Refresh strategy: refresh immediately on startup; the menu provides manual refresh and refresh interval selection; the interval is saved to `UserDefaults` and defaults to 5 minutes.
+- Launch at login: the menu's `Launch at Login` item creates or removes the user-level LaunchAgent at `~/Library/LaunchAgents/local.codex-meter.plist`; `ProgramArguments` points to the current app executable.
+- Verification command: `swift run CodexMeter --once` fetches and prints remaining quota without the GUI; `bash scripts/build-app.sh` creates `.build/CodexMeter.app`.
+- Distribution packaging: `bash scripts/build-app.sh --universal --sign-identity auto --dmg` builds a Universal Binary, automatically selects a signing identity, and generates `dist/CodexMeter-version.dmg` from `VERSION`; without a `Developer ID Application` certificate, it falls back to ad-hoc signing, which does not replace Apple notarization.
+- Version management: the version is read from `VERSION`; bump it with `scripts/bump-version.sh patch|minor|major` before publishing a new release.
+- Release script: `bash scripts/release.sh` chains Universal build, DMG generation, SHA256 generation, and release note generation; with `--publish`, it creates a GitHub Release; existing Releases with the same version are rejected by default, and intentional republishing requires `--force`.
+- Release bumping: `bash scripts/release.sh --publish --bump patch` bumps `VERSION` before publishing; use `--force` only when republishing the same version.
+- App icon: source PNG is `Assets/AppIcon.png`; the app bundle uses `Assets/AppIcon.icns`; the packaging script copies it to `Contents/Resources` and writes `CFBundleIconFile`.
+- Internationalization: app UI text uses `Sources/CodexMeter/Resources/*.lproj/Localizable.strings`; current app languages are `en`, `zh-Hans`, `ja`, `ko`, `es`, `fr`, and `de`; the packaging script copies `.lproj` directories into the app resources; the menu can follow the system language or force a specific language, and the preference is saved to `UserDefaults`. When adding UI text, update every language resource to avoid raw localization keys appearing in the menu.
 
-## 后续交接注意
+## Handoff Notes
 
-- 不要在日志、README、提交信息或错误输出中写入`access_token`、`refresh_token`、邮箱等敏感信息。
-- CodexMeter只能读取`~/.codex/auth.json`，禁止对该文件做任何写操作；不要在应用内刷新`access_token`或使用`refresh_token`，登录态刷新由Codex自己负责。
-- 如果Codex后端字段变化，优先用`codex app-server generate-ts`重新查看`GetAccountRateLimitsResponse`、`RateLimitSnapshot`和相关usage字段。
-- 若要打包成`.app`，可在现有SwiftPM可执行产物外增加一个轻量bundle脚本，保持App启动入口仍在`Sources/CodexMeter/main.swift`。
-- 正式给其他用户分发前，查看`RELEASE.md`中的Developer ID签名、公证、staple和spctl验证流程。
-- 后续优化计划记录在`ROADMAP.md`；P3按用户决定暂缓，当前候选项优先考虑增加最小测试。
+- Do not write `access_token`, `refresh_token`, emails, or other sensitive values to logs, README files, commit messages, or error output.
+- CodexMeter may only read `~/.codex/auth.json`; it must never write to that file. Do not refresh `access_token` in the app and do not use `refresh_token`; Codex is responsible for refreshing login state.
+- If Codex backend fields change, first use `codex app-server generate-ts` to inspect `GetAccountRateLimitsResponse`, `RateLimitSnapshot`, and related usage fields from the current Codex version.
+- If packaging as `.app`, keep the app startup entry in `Sources/CodexMeter/main.swift` and use the existing lightweight bundle script around the SwiftPM executable.
+- Before distributing to other users, read `RELEASE.md` for the Developer ID signing, notarization, stapling, and `spctl` verification workflow.
+- Future optimization plans are tracked in `ROADMAP.md`; P3 is deferred by user decision, and the current candidate priority is adding minimal tests.

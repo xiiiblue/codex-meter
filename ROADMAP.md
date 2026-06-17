@@ -1,100 +1,100 @@
-# CodexMeter后续优化路线图
+# CodexMeter Optimization Roadmap
 
-本文档记录已完成能力和后续候选项。P3目前按用户决定暂缓，不作为当前执行目标。
+This document records completed capabilities and candidate future work. P3 is currently deferred by user decision and is not an active target.
 
-## 已完成
+## Completed
 
-### P0体验修复
+### P0 Experience Fixes
 
-1. 刷新失败时保留旧值
-   - 状态栏继续显示上一次成功额度。
-   - 错误信息仅显示在菜单里。
+1. Preserve the previous value after refresh failures
+   - The status bar keeps showing the latest successful quota snapshot.
+   - Error details are shown only in the menu.
 
-2. 启动未登录引导
-   - 没有`~/.codex/auth.json`或不是ChatGPT登录态时，菜单中显示`codex login`引导。
+2. Signed-out startup guidance
+   - When `~/.codex/auth.json` is missing or the auth mode is not ChatGPT, the menu shows `codex login` guidance.
 
-3. 开机自启路径自修复
-   - 启动时检测LaunchAgent路径。
-   - 路径过期时提示并提供`修复开机自启路径`。
+3. Launch-at-login path self-repair
+   - The app checks the LaunchAgent path at startup.
+   - When the path is stale, the app prompts the user and offers `Repair Launch-at-Login Path`.
 
-### P1状态与提醒
+### P1 Status and Alerts
 
-1. 刷新详情增强
-   - 菜单显示`上次成功刷新`和`下次刷新`。
-   - 刷新失败时保留成功时间，并显示失败时间和原因。
+1. Improved refresh details
+   - The menu shows `Last Successful Refresh` and `Next Refresh`.
+   - After refresh failures, the last successful time is preserved, and the failure time and reason are shown.
 
-2. 低额度提醒
-   - 日限额或周限额低于`20%`时显示偏低提醒。
-   - 低于`10%`时显示告急提醒。
+2. Low-quota warnings
+   - The app shows a low warning when daily or weekly quota is below `20%`.
+   - The app shows a critical warning when quota is below `10%`.
 
-3. 额度重置倒计时
-   - 菜单显示具体重置时间和相对倒计时。
+3. Quota reset countdowns
+   - The menu shows concrete reset times and relative countdowns.
 
-### P2显示与分发
+### P2 Display and Distribution
 
-1. 菜单栏显示模式
-   - 支持`日24% 周32%`、`D24 W32`、`Codex 24%`和仅日限额。
-   - 选择保存到`UserDefaults`。
+1. Menu bar display modes
+   - Supports `D24% W32%`, `D24 W32`, `Codex 24%`, and daily quota only.
+   - The selection is saved to `UserDefaults`.
 
-2. Release校验值
-   - 发布DMG时生成SHA256。
-   - Release说明附带校验值。
+2. Release checksums
+   - DMG releases generate SHA256 checksums.
+   - Release notes include the checksum value.
 
-3. DMG视觉优化
-   - 增加DMG背景图。
-   - 固定窗口大小。
-   - 摆放`CodexMeter.app`、`Applications`快捷方式和首次打开说明。
+3. DMG visual polish
+   - Added a DMG background image.
+   - Fixed the DMG window size.
+   - Positioned `CodexMeter.app`, the `Applications` shortcut, and the first-open guide.
 
-4. 发布脚本
-   - `scripts/release.sh`串联构建、签名、DMG、校验、Release说明生成和上传。
-   - 版本号统一来自`VERSION`。
-   - 同版本Release默认拒绝覆盖，显式`--force`才允许重发。
+4. Release script
+   - `scripts/release.sh` chains build, signing, DMG generation, checksum generation, release note generation, and upload.
+   - The version is read from `VERSION`.
+   - Existing Releases with the same version are not overwritten by default; explicit `--force` is required.
 
-### 代码结构
+### Code Structure
 
-1. 拆分`Sources/CodexMeter/main.swift`
-   - 已完成：入口、AppDelegate、API客户端、登录项、偏好设置、模型和错误类型已拆分到独立文件。
+1. Split `Sources/CodexMeter/main.swift`
+   - Completed: the entry point, AppDelegate, API client, login item manager, preferences, models, and error types are split into independent files.
 
-### 国际化
+### Internationalization
 
-1. 应用UI文案本地化
-   - 已完成：菜单、错误提示、状态栏和`--once`输出支持中文和英文。
-   - 已完成：菜单中可选择跟随系统、简体中文或English，并立即生效。
+1. Localized app UI text
+   - Completed: menu text, error messages, status bar text, and `--once` output support Chinese and English.
+   - Completed: the menu can select System, Simplified Chinese, or English and applies the change immediately.
 
-2. 新增主流语言
-   - 已完成：新增日本語、한국어、Español、Français和Deutsch。
-   - 语言菜单使用原生名称显示。
+2. Added major languages
+   - Completed: added Japanese, Korean, Spanish, French, and German.
+   - The language menu displays language names natively in the app.
 
-## 当前收口项
+## Current Wrap-up Items
 
-1. 路线图状态更新
-   - 已完成：本文档已把P0/P1/P2从待办改为已完成记录。
+1. Roadmap status update
+   - Completed: this document has moved P0, P1, and P2 from todo items to completed records.
 
-2. 发布脚本自动递增版本
-   - 已完成：支持`scripts/release.sh --publish --bump patch`。
-   - 同版本Release仍默认拒绝覆盖。
+2. Automatic release version bumping
+   - Completed: supports `scripts/release.sh --publish --bump patch`.
+   - Existing Releases with the same version are still protected by default.
 
-3. DMG打包失败清理
-   - 已完成：`build-app.sh --dmg`异常退出时会自动卸载临时挂载卷并删除`-rw.dmg`。
+3. DMG cleanup after packaging failures
+   - Completed: `build-app.sh --dmg` automatically detaches temporary mounted volumes and deletes `-rw.dmg` on abnormal exits.
 
-## 暂缓
+## Deferred
 
-### P3新功能
+### P3 New Features
 
-1. 检查更新
-   - 菜单中增加`检查更新`。
-   - 查询GitHub最新Release。
-   - 如果有新版，打开Release页面。
+1. Check for updates
+   - Add `Check for Updates` to the menu.
+   - Query the latest GitHub Release.
+   - Open the Release page when a new version exists.
 
-2. 多账号或工作区显示
-   - 显示当前账号、plan或workspace。
-   - 目标是避免用户误判正在看的额度归属。
+2. Multi-account or workspace display
+   - Show the current account, plan, or workspace.
+   - The goal is to avoid users misreading which quota they are viewing.
 
-## 候选优化
+## Candidate Improvements
 
-1. 增加最小单元测试
-   - 覆盖显示模式、刷新频率、剩余百分比边界和重置倒计时文案。
+1. Add minimal unit tests
+   - Cover display modes, refresh intervals, remaining-percentage boundaries, and reset-countdown text.
 
-2. 认证文件写回保护
-   - 已取消：用户明确要求CodexMeter不得写入`~/.codex/auth.json`。
-   - 后续约束：登录态刷新由Codex自己负责，CodexMeter只读认证文件。
+2. Auth file write protection
+   - Canceled: the user explicitly required CodexMeter to never write to `~/.codex/auth.json`.
+   - Ongoing constraint: Codex owns login-state refresh; CodexMeter only reads the auth file.
