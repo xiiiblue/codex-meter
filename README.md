@@ -1,5 +1,7 @@
 # CodexMeter
 
+[中文](./README_CN.md)
+
 CodexMeter is a native macOS menu bar utility that reads the current machine's Codex login state, fetches Codex usage for the ChatGPT account, and shows the remaining daily and weekly quota percentages directly in the menu bar.
 
 ## Features
@@ -114,6 +116,7 @@ The DMG also includes `First Open Guide.txt`.
 ├── scripts/release.sh
 ├── Package.swift
 ├── README.md
+├── README_CN.md
 └── AGENTS.md
 ```
 
