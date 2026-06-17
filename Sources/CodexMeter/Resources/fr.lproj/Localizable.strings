@@ -36,7 +36,6 @@
 "menu.language" = "Langue";
 "menu.launchAtLogin" = "Lancer à la connexion";
 "menu.loginItemPathExpired" = "Le chemin de lancement à la connexion a expiré";
-"menu.nextRefresh" = "Prochaine actualisation: %@";
 "menu.quit" = "Quitter";
 "menu.refreshInterval" = "Intervalle d’actualisation";
 "menu.refreshNow" = "Actualiser maintenant";

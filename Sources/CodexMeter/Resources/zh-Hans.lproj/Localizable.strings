@@ -36,7 +36,6 @@
 "menu.language" = "语言";
 "menu.launchAtLogin" = "开机自启";
 "menu.loginItemPathExpired" = "开机自启路径已过期";
-"menu.nextRefresh" = "下次刷新:%@";
 "menu.quit" = "退出";
 "menu.refreshInterval" = "刷新频率";
 "menu.refreshNow" = "立即刷新";

@@ -36,7 +36,6 @@
 "menu.language" = "언어";
 "menu.launchAtLogin" = "로그인 시 실행";
 "menu.loginItemPathExpired" = "로그인 시 실행 경로가 만료되었습니다";
-"menu.nextRefresh" = "다음 새로 고침:%@";
 "menu.quit" = "종료";
 "menu.refreshInterval" = "새로 고침 간격";
 "menu.refreshNow" = "지금 새로 고침";

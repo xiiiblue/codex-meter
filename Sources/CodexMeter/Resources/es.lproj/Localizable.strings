@@ -36,7 +36,6 @@
 "menu.language" = "Idioma";
 "menu.launchAtLogin" = "Abrir al iniciar sesión";
 "menu.loginItemPathExpired" = "La ruta de inicio de sesión caducó";
-"menu.nextRefresh" = "Próxima actualización: %@";
 "menu.quit" = "Salir";
 "menu.refreshInterval" = "Intervalo de actualización";
 "menu.refreshNow" = "Actualizar ahora";

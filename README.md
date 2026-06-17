@@ -35,7 +35,7 @@ The menu bar will show:
 D45% W35%
 ```
 
-The menu includes manual refresh, launch at login, refresh interval, refresh time, and quota reset times.
+The menu includes manual refresh, launch at login, refresh interval, last successful refresh time, and quota reset times.
 
 You can also run a headless one-shot verification first:
 

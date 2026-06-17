@@ -36,7 +36,6 @@
 "menu.language" = "Language";
 "menu.launchAtLogin" = "Launch at login";
 "menu.loginItemPathExpired" = "Launch at login path expired";
-"menu.nextRefresh" = "Next refresh: %@";
 "menu.quit" = "Quit";
 "menu.refreshInterval" = "Refresh interval";
 "menu.refreshNow" = "Refresh Now";

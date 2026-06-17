@@ -83,9 +83,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             menu.addItem(.separator())
             menu.addItem(NSMenuItem(title: L.format("menu.lastSuccessfulRefresh", format(snapshot.refreshedAt)), action: nil, keyEquivalent: ""))
-            if let nextRefreshAt = timer?.fireDate {
-                menu.addItem(NSMenuItem(title: L.format("menu.nextRefresh", format(nextRefreshAt)), action: nil, keyEquivalent: ""))
-            }
             if let refreshError {
                 menu.addItem(.separator())
                 let failedAt = latestRefreshErrorAt.map(format) ?? L.text("time.unknown")

@@ -36,7 +36,6 @@
 "menu.language" = "言語";
 "menu.launchAtLogin" = "ログイン時に起動";
 "menu.loginItemPathExpired" = "ログイン時起動のパスが期限切れです";
-"menu.nextRefresh" = "次回更新:%@";
 "menu.quit" = "終了";
 "menu.refreshInterval" = "更新間隔";
 "menu.refreshNow" = "今すぐ更新";

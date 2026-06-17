@@ -36,7 +36,6 @@
 "menu.language" = "Sprache";
 "menu.launchAtLogin" = "Bei Anmeldung starten";
 "menu.loginItemPathExpired" = "Pfad für Start bei Anmeldung ist abgelaufen";
-"menu.nextRefresh" = "Nächste Aktualisierung: %@";
 "menu.quit" = "Beenden";
 "menu.refreshInterval" = "Aktualisierungsintervall";
 "menu.refreshNow" = "Jetzt aktualisieren";
