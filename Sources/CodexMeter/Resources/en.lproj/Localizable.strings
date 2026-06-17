@@ -18,6 +18,11 @@
 "guidance.chatGPTRequired.2" = "Run again: codex login";
 "guidance.chatGPTRequired.3" = "Choose a ChatGPT account when logging in";
 "language.english" = "English";
+"language.french" = "Français";
+"language.german" = "Deutsch";
+"language.japanese" = "日本語";
+"language.korean" = "한국어";
+"language.spanish" = "Español";
 "language.system" = "System";
 "language.zhHans" = "Simplified Chinese";
 "limit.day" = "Daily limit";

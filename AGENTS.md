@@ -20,7 +20,7 @@
 - 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会创建GitHub Release；同版本Release已存在时默认拒绝覆盖，确认重发时使用`--force`。
 - 发布递增：`bash scripts/release.sh --publish --bump patch`会先递增`VERSION`再发布；同版本重发才使用`--force`。
 - 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
-- 国际化：应用UI文案使用`Sources/CodexMeter/Resources/en.lproj`和`zh-Hans.lproj`，打包脚本会复制`.lproj`目录到App资源目录；菜单中可选择跟随系统、简体中文或English，偏好保存到`UserDefaults`。
+- 国际化：应用UI文案使用`Sources/CodexMeter/Resources/*.lproj/Localizable.strings`，当前支持`en`、`zh-Hans`、`ja`、`ko`、`es`、`fr`、`de`；打包脚本会复制`.lproj`目录到App资源目录；菜单中可选择跟随系统或固定语言，偏好保存到`UserDefaults`。新增UI文案时必须同步维护全部语言资源，避免菜单显示原始key。
 
 ## 后续交接注意
 

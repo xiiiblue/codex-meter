@@ -137,6 +137,11 @@ cat > "$CONTENTS_DIR/Info.plist" <<PLIST
   <array>
     <string>en</string>
     <string>zh-Hans</string>
+    <string>ja</string>
+    <string>ko</string>
+    <string>es</string>
+    <string>fr</string>
+    <string>de</string>
   </array>
   <key>LSMinimumSystemVersion</key>
   <string>14.0</string>

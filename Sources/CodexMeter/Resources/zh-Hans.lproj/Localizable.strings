@@ -18,6 +18,11 @@
 "guidance.chatGPTRequired.2" = "请重新运行:codex login";
 "guidance.chatGPTRequired.3" = "登录时选择ChatGPT账号";
 "language.english" = "English";
+"language.french" = "Français";
+"language.german" = "Deutsch";
+"language.japanese" = "日本語";
+"language.korean" = "한국어";
+"language.spanish" = "Español";
 "language.system" = "跟随系统";
 "language.zhHans" = "简体中文";
 "limit.day" = "日限额";

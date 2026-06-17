@@ -47,6 +47,11 @@ enum AppLanguage: String, CaseIterable {
     case system
     case zhHans = "zh-Hans"
     case en
+    case ja
+    case ko
+    case es
+    case fr
+    case de
 
     var title: String {
         switch self {
@@ -56,6 +61,16 @@ enum AppLanguage: String, CaseIterable {
             return L.text("language.zhHans")
         case .en:
             return L.text("language.english")
+        case .ja:
+            return L.text("language.japanese")
+        case .ko:
+            return L.text("language.korean")
+        case .es:
+            return L.text("language.spanish")
+        case .fr:
+            return L.text("language.french")
+        case .de:
+            return L.text("language.german")
         }
     }
 }

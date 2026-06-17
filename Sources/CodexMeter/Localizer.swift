@@ -9,6 +9,16 @@ enum L {
             return Locale(identifier: "zh_Hans")
         case .en:
             return Locale(identifier: "en")
+        case .ja:
+            return Locale(identifier: "ja")
+        case .ko:
+            return Locale(identifier: "ko")
+        case .es:
+            return Locale(identifier: "es")
+        case .fr:
+            return Locale(identifier: "fr")
+        case .de:
+            return Locale(identifier: "de")
         }
     }
 
@@ -51,6 +61,16 @@ enum L {
             return ["zh-Hans", "en"]
         case .en:
             return ["en"]
+        case .ja:
+            return ["ja", "en"]
+        case .ko:
+            return ["ko", "en"]
+        case .es:
+            return ["es", "en"]
+        case .fr:
+            return ["fr", "en"]
+        case .de:
+            return ["de", "en"]
         }
 
         let preferences = UserDefaults.standard.stringArray(forKey: "AppleLanguages") ?? Locale.preferredLanguages
@@ -61,6 +81,16 @@ enum L {
                 result.append("zh-Hans")
             } else if normalized.hasPrefix("en") {
                 result.append("en")
+            } else if normalized.hasPrefix("ja") {
+                result.append("ja")
+            } else if normalized.hasPrefix("ko") {
+                result.append("ko")
+            } else if normalized.hasPrefix("es") {
+                result.append("es")
+            } else if normalized.hasPrefix("fr") {
+                result.append("fr")
+            } else if normalized.hasPrefix("de") {
+                result.append("de")
             }
         }
         result.append("en")
