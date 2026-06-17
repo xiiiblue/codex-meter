@@ -5,13 +5,11 @@ struct CodexAuthFile: Codable {
     struct Tokens: Codable {
         var idToken: String?
         var accessToken: String
-        var refreshToken: String?
         var accountId: String?
 
         enum CodingKeys: String, CodingKey {
             case idToken = "id_token"
             case accessToken = "access_token"
-            case refreshToken = "refresh_token"
             case accountId = "account_id"
         }
     }
@@ -148,6 +146,7 @@ enum MeterError: LocalizedError {
     case authFileMissing(String)
     case chatGPTAuthRequired
     case invalidResponse(Int)
+    case codexAuthExpired
     case noRateLimits
 
     var errorDescription: String? {
@@ -158,6 +157,8 @@ enum MeterError: LocalizedError {
             return "需要ChatGPT登录认证"
         case .invalidResponse(let code):
             return "接口返回HTTP \(code)"
+        case .codexAuthExpired:
+            return "Codex登录态可能已过期"
         case .noRateLimits:
             return "接口没有返回额度窗口"
         }
@@ -176,6 +177,12 @@ enum MeterError: LocalizedError {
                 "当前不是ChatGPT登录态",
                 "请重新运行: codex login",
                 "登录时选择ChatGPT账号"
+            ]
+        case .codexAuthExpired:
+            return [
+                "CodexMeter不会写入认证文件",
+                "请在Codex中重新登录或刷新登录态",
+                "完成后点“立即刷新”"
             ]
         case .invalidResponse, .noRateLimits:
             return nil
@@ -256,8 +263,6 @@ final class LoginItemManager {
 final class CodexUsageClient {
     private let authPath: String
     private let usageURL = URL(string: "https://chatgpt.com/backend-api/wham/usage")!
-    private let refreshURL = URL(string: "https://auth.openai.com/oauth/token")!
-    private let codexClientID = "app_EMoamEEZ73f0CkXaXp7hrann"
     private let session = URLSession.shared
 
     init(authPath: String) {
@@ -265,17 +270,8 @@ final class CodexUsageClient {
     }
 
     func fetchUsage() async throws -> MeterSnapshot {
-        var auth = try loadAuth()
-        if tokenExpiresSoon(auth.tokens.accessToken) {
-            auth = try await refresh(auth)
-        }
-
-        do {
-            return try await requestUsage(auth)
-        } catch MeterError.invalidResponse(401) {
-            auth = try await refresh(auth)
-            return try await requestUsage(auth)
-        }
+        let auth = try loadAuth()
+        return try await requestUsage(auth)
     }
 
     private func loadAuth() throws -> CodexAuthFile {
@@ -305,6 +301,9 @@ final class CodexUsageClient {
         guard let http = response as? HTTPURLResponse else {
             throw MeterError.invalidResponse(-1)
         }
+        if http.statusCode == 401 {
+            throw MeterError.codexAuthExpired
+        }
         guard (200..<300).contains(http.statusCode) else {
             throw MeterError.invalidResponse(http.statusCode)
         }
@@ -332,85 +331,6 @@ final class CodexUsageClient {
         let remaining = max(0, min(100, Int((100 - window.usedPercent).rounded())))
         let resetAt = window.resetAt.map { Date(timeIntervalSince1970: $0) }
         return LimitSnapshot(title: title, remainingPercent: remaining, resetAt: resetAt)
-    }
-
-    private func refresh(_ auth: CodexAuthFile) async throws -> CodexAuthFile {
-        guard let refreshToken = auth.tokens.refreshToken, !refreshToken.isEmpty else {
-            throw MeterError.invalidResponse(401)
-        }
-
-        var components = URLComponents()
-        components.queryItems = [
-            URLQueryItem(name: "grant_type", value: "refresh_token"),
-            URLQueryItem(name: "refresh_token", value: refreshToken),
-            URLQueryItem(name: "client_id", value: codexClientID)
-        ]
-
-        var request = URLRequest(url: refreshURL)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
-
-        let (data, response) = try await session.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw MeterError.invalidResponse(-1)
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw MeterError.invalidResponse(http.statusCode)
-        }
-
-        struct RefreshResponse: Decodable {
-            let accessToken: String
-            let idToken: String?
-            let refreshToken: String?
-
-            enum CodingKeys: String, CodingKey {
-                case accessToken = "access_token"
-                case idToken = "id_token"
-                case refreshToken = "refresh_token"
-            }
-        }
-
-        let refreshed = try JSONDecoder().decode(RefreshResponse.self, from: data)
-        var next = auth
-        next.tokens.accessToken = refreshed.accessToken
-        next.tokens.idToken = refreshed.idToken ?? next.tokens.idToken
-        next.tokens.refreshToken = refreshed.refreshToken ?? next.tokens.refreshToken
-        next.lastRefresh = ISO8601DateFormatter().string(from: Date())
-        try saveAuth(next)
-        return next
-    }
-
-    private func saveAuth(_ auth: CodexAuthFile) throws {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let data = try encoder.encode(auth)
-        let url = URL(fileURLWithPath: authPath)
-        let tmp = url.deletingLastPathComponent().appendingPathComponent(".auth.json.codex-meter.tmp")
-        try data.write(to: tmp, options: .atomic)
-        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: tmp.path)
-        _ = try FileManager.default.replaceItemAt(url, withItemAt: tmp)
-    }
-
-    private func tokenExpiresSoon(_ jwt: String) -> Bool {
-        let parts = jwt.split(separator: ".")
-        guard parts.count >= 2,
-              let payload = decodeBase64URL(String(parts[1])),
-              let object = try? JSONSerialization.jsonObject(with: payload) as? [String: Any],
-              let exp = object["exp"] as? TimeInterval else {
-            return false
-        }
-
-        return Date(timeIntervalSince1970: exp).timeIntervalSinceNow < 300
-    }
-
-    private func decodeBase64URL(_ value: String) -> Data? {
-        var base64 = value.replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        let padding = (4 - base64.count % 4) % 4
-        base64 += String(repeating: "=", count: padding)
-        return Data(base64Encoded: base64)
     }
 }
 

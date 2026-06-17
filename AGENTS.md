@@ -23,7 +23,8 @@
 ## 后续交接注意
 
 - 不要在日志、README、提交信息或错误输出中写入`access_token`、`refresh_token`、邮箱等敏感信息。
+- CodexMeter只能读取`~/.codex/auth.json`，禁止对该文件做任何写操作；不要在应用内刷新`access_token`或使用`refresh_token`，登录态刷新由Codex自己负责。
 - 如果Codex后端字段变化，优先用`codex app-server generate-ts`重新查看`GetAccountRateLimitsResponse`、`RateLimitSnapshot`和相关usage字段。
 - 若要打包成`.app`，可在现有SwiftPM可执行产物外增加一个轻量bundle脚本，保持主逻辑仍在`Sources/CodexMeter/main.swift`。
 - 正式给其他用户分发前，查看`RELEASE.md`中的Developer ID签名、公证、staple和spctl验证流程。
-- 后续优化计划记录在`ROADMAP.md`；P3按用户决定暂缓，当前候选项优先考虑拆分`main.swift`、增加最小测试和认证文件写回保护。
+- 后续优化计划记录在`ROADMAP.md`；P3按用户决定暂缓，当前候选项优先考虑拆分`main.swift`和增加最小测试。

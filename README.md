@@ -136,9 +136,9 @@ scripts/release.sh --publish --force
 
 ## 安全说明
 
-- 应用只在本机读取`~/.codex/auth.json`，不会把令牌写入日志、README或菜单。
-- 当访问令牌即将过期或接口返回401时，会尝试使用`refresh_token`刷新认证文件。
-- 认证文件刷新后仍使用`0600`权限写回。
+- 应用只在本机读取`~/.codex/auth.json`，不会对该文件做任何写操作，也不会把令牌写入日志、README或菜单。
+- CodexMeter不刷新`access_token`，也不使用`refresh_token`；登录态刷新由Codex自己负责。
+- 当接口返回401时，菜单会提示在Codex中重新登录或刷新登录态，然后手动点`立即刷新`。
 - 开机自启只写入当前用户的LaunchAgent，不需要管理员权限。
 
 ## 开发验证
