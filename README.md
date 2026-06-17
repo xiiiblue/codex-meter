@@ -1,61 +1,63 @@
 # CodexMeter
 
-CodexMeter是一个macOS原生菜单栏小工具，用当前机器的Codex登录态读取ChatGPT账号的Codex额度，并在菜单栏显示日限额和周限额剩余百分比。
+[中文](./README_CN.md)
 
-## 功能
+CodexMeter is a native macOS menu bar utility that reads the current machine's Codex login state, fetches Codex usage for the ChatGPT account, and shows the remaining daily and weekly quota percentages directly in the menu bar.
 
-- 菜单栏直接显示`日xx% 周xx%`。
-- 支持菜单栏显示模式切换：标准、紧凑、仅最低额度、仅日限额。
-- 下拉菜单显示日限额、周限额、重置时间、订阅类型和最近刷新时间。
-- 支持手动刷新。
-- 支持开机自启。
-- 支持刷新频率配置：`1分钟`、`5分钟`、`15分钟`、`30分钟`、`60分钟`。
-- 支持在菜单中选择跟随系统、简体中文、English、日本語、한국어、Español、Français或Deutsch。
-- 支持无GUI验证模式：`swift run CodexMeter --once`。
+## Features
 
-## 环境要求
+- Shows `Dxx% Wxx%` directly in the menu bar.
+- Supports menu bar display modes: standard, compact, lowest quota only, and daily quota only.
+- Shows daily quota, weekly quota, reset times, subscription type, and latest refresh time in the menu.
+- Supports manual refresh.
+- Supports launch at login.
+- Supports configurable refresh intervals: `1 minute`, `5 minutes`, `15 minutes`, `30 minutes`, and `60 minutes`.
+- Supports choosing System, Simplified Chinese, English, Japanese, Korean, Spanish, French, or German in the menu.
+- Supports headless verification mode: `swift run CodexMeter --once`.
 
-- macOS14或更高版本。
-- 已安装Xcode或Swift工具链。
-- 已在本机Codex中通过ChatGPT登录，默认需要存在`~/.codex/auth.json`。
+## Requirements
 
-## 运行
+- macOS 14 or later.
+- Xcode or the Swift toolchain installed.
+- Codex has already signed in with ChatGPT on this Mac, and `~/.codex/auth.json` exists by default.
+
+## Run
 
 ```bash
 swift run CodexMeter
 ```
 
-菜单栏会显示：
+The menu bar will show:
 
 ```text
-日45% 周35%
+D45% W35%
 ```
 
-下拉菜单包含手动刷新、开机自启、刷新频率、订阅类型、刷新时间和额度重置时间。
+The menu includes manual refresh, launch at login, refresh interval, subscription type, refresh time, and quota reset times.
 
-也可以先做一次无GUI验证：
+You can also run a headless one-shot verification first:
 
 ```bash
 swift run CodexMeter --once
 ```
 
-## 打包成App
+## Build an App
 
 ```bash
 bash scripts/build-app.sh
 open .build/CodexMeter.app
 ```
 
-应用图标源文件位于`Assets/AppIcon.png`，打包使用`Assets/AppIcon.icns`。
-DMG背景图位于`Assets/Installer/DmgBackground.png`。
+The app icon source file is `Assets/AppIcon.png`, and the packaged app uses `Assets/AppIcon.icns`.
+The DMG background image is `Assets/Installer/DmgBackground.png`.
 
-生成可分发的Universal Binary和DMG：
+Build a distributable Universal Binary and DMG:
 
 ```bash
 bash scripts/build-app.sh --universal --sign-identity auto --dmg
 ```
 
-输出文件：
+Output files:
 
 ```text
 .build/CodexMeter.app
@@ -63,27 +65,27 @@ dist/CodexMeter-$(cat VERSION).dmg
 dist/CodexMeter-$(cat VERSION).dmg.sha256
 ```
 
-如果本机没有`Developer ID Application`证书，`--sign-identity auto`会退回ad-hoc签名。ad-hoc签名不等于Apple公证，陌生机器首次打开仍可能被Gatekeeper拦截。正式分发请参考[RELEASE.md](./RELEASE.md)。
+If this Mac does not have a `Developer ID Application` certificate, `--sign-identity auto` falls back to ad-hoc signing. Ad-hoc signing is not Apple notarization, so Gatekeeper may still block first launch on another Mac. For formal distribution, see [RELEASE.md](./RELEASE.md).
 
-## 未公证DMG安装
+## Install an Unnotarized DMG
 
-不付费使用Apple Developer Program时，可以分发未公证DMG。用户安装步骤：
+If you do not pay for the Apple Developer Program, you can distribute an unnotarized DMG. Users should install it as follows:
 
-1. 打开`CodexMeter-版本号.dmg`。
-2. 将`CodexMeter.app`拖到`Applications`。
-3. 第一次按住Control点击或右键点击`CodexMeter.app`，选择`打开`。
-4. 如果macOS提示无法验证开发者，继续选择`打开`；如果仍被阻止，到`系统设置 > 隐私与安全性`中允许打开。
+1. Open `CodexMeter-version.dmg`.
+2. Drag `CodexMeter.app` to `Applications`.
+3. On first launch, Control-click or right-click `CodexMeter.app`, then choose `Open`.
+4. If macOS says the developer cannot be verified, choose `Open` again. If it is still blocked, allow it in `System Settings > Privacy & Security`.
 
-DMG里也包含`首次打开说明.txt`。
+The DMG also includes `首次打开说明.txt`.
 
-## 选项
+## Options
 
-- 开机自启：在菜单里勾选`开机自启`后，会写入用户级LaunchAgent：`~/Library/LaunchAgents/local.codex-meter.plist`。
-- 刷新频率：菜单里可选`1分钟`、`5分钟`、`15分钟`、`30分钟`、`60分钟`，选择会保存到`UserDefaults`并立即重建刷新计时器。
-- 显示模式：菜单里可切换`日24% 周32%`、`D24 W32`、`Codex 24%`、`仅日限额`。
-- 语言：菜单里可选`跟随系统`、`简体中文`、`English`、`日本語`、`한국어`、`Español`、`Français`、`Deutsch`，选择会保存到`UserDefaults`并立即生效。
+- Launch at login: checking `Launch at Login` in the menu writes a user-level LaunchAgent at `~/Library/LaunchAgents/local.codex-meter.plist`.
+- Refresh interval: the menu offers `1 minute`, `5 minutes`, `15 minutes`, `30 minutes`, and `60 minutes`. The selected value is saved to `UserDefaults` and immediately rebuilds the refresh timer.
+- Display mode: the menu can switch between `D24% W32%`, `D24 W32`, `Codex 24%`, and daily quota only.
+- Language: the menu offers `System`, `简体中文`, `English`, `日本語`, `한국어`, `Español`, `Français`, and `Deutsch`. The selected value is saved to `UserDefaults` and takes effect immediately.
 
-## 项目结构
+## Project Structure
 
 ```text
 .
@@ -114,52 +116,53 @@ DMG里也包含`首次打开说明.txt`。
 ├── scripts/release.sh
 ├── Package.swift
 ├── README.md
+├── README_CN.md
 └── AGENTS.md
 ```
 
-## 版本管理
+## Version Management
 
-项目版本号统一写在`VERSION`文件中，`build-app.sh`、`release.sh`、`Info.plist`和DMG文件名都会读取它。
+The project version is stored in `VERSION`. `build-app.sh`, `release.sh`, `Info.plist`, and DMG filenames all read from it.
 
-发布新版本前先递增版本号：
+Bump the version before publishing a new release:
 
 ```bash
 scripts/bump-version.sh patch
 ```
 
-也可以让发布脚本在构建前自动递增版本：
+The release script can also bump the version before building and publishing:
 
 ```bash
 scripts/release.sh --publish --bump patch
 ```
 
-递增规则：
+Bump rules:
 
-- `patch`：修复bug、文档或打包脚本调整，例如`0.1.0 -> 0.1.1`。
-- `minor`：新增用户可见功能，例如`0.1.0 -> 0.2.0`。
-- `major`：稳定版或破坏性变更，例如`0.9.0 -> 1.0.0`。
+- `patch`: bug fixes, documentation changes, or packaging script changes, for example `0.1.0 -> 0.1.1`.
+- `minor`: user-visible features, for example `0.1.0 -> 0.2.0`.
+- `major`: stable releases or breaking changes, for example `0.9.0 -> 1.0.0`.
 
-发布到GitHub时，如果同版本Release已经存在，`scripts/release.sh --publish`会退出，不会覆盖已有资产。确认需要重发同版本时，显式使用：
+When publishing to GitHub, `scripts/release.sh --publish` exits if a Release with the same version already exists, so existing assets are not overwritten. To intentionally republish the same version, use:
 
 ```bash
 scripts/release.sh --publish --force
 ```
 
-## 数据来源
+## Data Source
 
-- 默认读取`~/.codex/auth.json`。
-- 需要`auth_mode`为`chatgpt`，也就是已经通过Codex登录ChatGPT账号。
-- 请求`https://chatgpt.com/backend-api/wham/usage`，使用`access_token`和`ChatGPT-Account-ID`请求头。
-- `primary_window.used_percent`按日限额显示，`secondary_window.used_percent`按周限额显示；剩余百分比为`100-used_percent`。
+- Reads `~/.codex/auth.json` by default.
+- Requires `auth_mode` to be `chatgpt`, meaning Codex has signed in with a ChatGPT account.
+- Requests `https://chatgpt.com/backend-api/wham/usage` with the `access_token` and `ChatGPT-Account-ID` headers.
+- `primary_window.used_percent` is displayed as daily quota usage, and `secondary_window.used_percent` is displayed as weekly quota usage. Remaining percentage is `100 - used_percent`.
 
-## 安全说明
+## Security Notes
 
-- 应用只在本机读取`~/.codex/auth.json`，不会对该文件做任何写操作，也不会把令牌写入日志、README或菜单。
-- CodexMeter不刷新`access_token`，也不使用`refresh_token`；登录态刷新由Codex自己负责。
-- 当接口返回401时，菜单会提示在Codex中重新登录或刷新登录态，然后手动点`立即刷新`。
-- 开机自启只写入当前用户的LaunchAgent，不需要管理员权限。
+- The app only reads `~/.codex/auth.json` locally. It never writes to this file and never writes tokens to logs, README files, or menus.
+- CodexMeter does not refresh `access_token` and does not use `refresh_token`; Codex is responsible for refreshing the login state.
+- When the API returns 401, the menu asks the user to sign in again or refresh the login state in Codex, then click `Refresh Now` manually.
+- Launch at login only writes a LaunchAgent for the current user and does not require administrator privileges.
 
-## 开发验证
+## Development Verification
 
 ```bash
 swift build
@@ -174,6 +177,6 @@ codesign --verify --deep --strict --verbose=2 .build/CodexMeter.app
 cat "dist/CodexMeter-$(cat VERSION).dmg.sha256"
 ```
 
-## 注意
+## Note
 
-Codex额度接口属于Codex当前客户端使用的ChatGPT后端接口，不是公开稳定API。如果后端字段变化，优先用当前Codex版本生成的app-server协议类型重新核对字段。
+The Codex usage endpoint is a ChatGPT backend endpoint currently used by the Codex client, not a public stable API. If backend fields change, first regenerate and inspect the app-server protocol types from the current Codex version.
