@@ -37,7 +37,7 @@ enum L {
     }
 
     private static func localizedBundles() -> [Bundle] {
-        let roots = [Bundle.main, Bundle.module]
+        let roots = resourceRoots()
         var bundles: [Bundle] = []
         for language in preferredLocalizations() {
             for root in roots {
@@ -51,6 +51,13 @@ enum L {
         }
         bundles.append(contentsOf: roots)
         return bundles
+    }
+
+    private static func resourceRoots() -> [Bundle] {
+        if Bundle.main.bundleURL.pathExtension == "app" {
+            return [Bundle.main]
+        }
+        return [Bundle.main, Bundle.module]
     }
 
     private static func preferredLocalizations() -> [String] {
