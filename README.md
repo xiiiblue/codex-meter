@@ -89,7 +89,14 @@ DMG里也包含`首次打开说明.txt`。
 │   ├── AppIcon.icns
 │   ├── AppIcon.png
 │   └── Installer/DmgBackground.png
-├── Sources/CodexMeter/main.swift
+├── Sources/CodexMeter/
+│   ├── AppDelegate.swift
+│   ├── CodexUsageClient.swift
+│   ├── LoginItemManager.swift
+│   ├── MeterError.swift
+│   ├── Models.swift
+│   ├── Preferences.swift
+│   └── main.swift
 ├── VERSION
 ├── scripts/build-app.sh
 ├── scripts/bump-version.sh

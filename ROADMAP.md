@@ -50,6 +50,11 @@
    - 版本号统一来自`VERSION`。
    - 同版本Release默认拒绝覆盖，显式`--force`才允许重发。
 
+### 代码结构
+
+1. 拆分`Sources/CodexMeter/main.swift`
+   - 已完成：入口、AppDelegate、API客户端、登录项、偏好设置、模型和错误类型已拆分到独立文件。
+
 ## 当前收口项
 
 1. 路线图状态更新
@@ -77,12 +82,9 @@
 
 ## 候选优化
 
-1. 拆分`Sources/CodexMeter/main.swift`
-   - 可拆为`CodexUsageClient.swift`、`LoginItemManager.swift`、`Preferences.swift`、`Models.swift`和`AppDelegate.swift`。
-
-2. 增加最小单元测试
+1. 增加最小单元测试
    - 覆盖显示模式、刷新频率、剩余百分比边界和重置倒计时文案。
 
-3. 认证文件写回保护
+2. 认证文件写回保护
    - 已取消：用户明确要求CodexMeter不得写入`~/.codex/auth.json`。
    - 后续约束：登录态刷新由Codex自己负责，CodexMeter只读认证文件。
