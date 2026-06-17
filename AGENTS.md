@@ -17,6 +17,7 @@
 - 分发打包：`bash scripts/build-app.sh --universal --sign-identity auto --dmg`会构建Universal Binary、自动选择签名身份并按`VERSION`生成`dist/CodexMeter-版本号.dmg`；没有`Developer ID Application`证书时会退回ad-hoc签名，不能替代Apple公证。
 - 版本管理：版本号统一来自`VERSION`；发布新版本前用`scripts/bump-version.sh patch|minor|major`递增。
 - 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会创建GitHub Release；同版本Release已存在时默认拒绝覆盖，确认重发时使用`--force`。
+- 发布递增：`bash scripts/release.sh --publish --bump patch`会先递增`VERSION`再发布；同版本重发才使用`--force`。
 - 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
 
 ## 后续交接注意
@@ -25,4 +26,4 @@
 - 如果Codex后端字段变化，优先用`codex app-server generate-ts`重新查看`GetAccountRateLimitsResponse`、`RateLimitSnapshot`和相关usage字段。
 - 若要打包成`.app`，可在现有SwiftPM可执行产物外增加一个轻量bundle脚本，保持主逻辑仍在`Sources/CodexMeter/main.swift`。
 - 正式给其他用户分发前，查看`RELEASE.md`中的Developer ID签名、公证、staple和spctl验证流程。
-- 后续优化计划记录在`ROADMAP.md`，优先处理刷新失败保留旧值、低额度提醒和刷新详情增强。
+- 后续优化计划记录在`ROADMAP.md`；P3按用户决定暂缓，当前候选项优先考虑拆分`main.swift`、增加最小测试和认证文件写回保护。

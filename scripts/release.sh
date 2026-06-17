@@ -3,14 +3,18 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PRODUCT_NAME="CodexMeter"
-VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
-DIST_DIR="$ROOT_DIR/dist"
-DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}.dmg"
-SHA_PATH="$DMG_PATH.sha256"
-NOTES_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}-release-notes.md"
 PUBLISH="false"
 FORCE="false"
+BUMP_PART=""
 REPO="xiiiblue/codex-meter"
+
+load_version() {
+  VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/VERSION")"
+  DIST_DIR="$ROOT_DIR/dist"
+  DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}.dmg"
+  SHA_PATH="$DMG_PATH.sha256"
+  NOTES_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}-release-notes.md"
+}
 
 usage() {
   cat <<USAGE
@@ -18,6 +22,8 @@ Usage: scripts/release.sh [options]
 
 Options:
   --publish   Create the GitHub Release after building assets.
+  --bump <part>
+              Bump VERSION before building. part must be major, minor, or patch.
   --force     Allow overwriting an existing GitHub Release asset. Only valid with --publish.
   -h, --help  Show this help.
 USAGE
@@ -28,6 +34,14 @@ while [[ $# -gt 0 ]]; do
     --publish)
       PUBLISH="true"
       shift
+      ;;
+    --bump)
+      BUMP_PART="${2:-}"
+      if [[ -z "$BUMP_PART" ]]; then
+        echo "--bump requires major, minor, or patch" >&2
+        exit 2
+      fi
+      shift 2
       ;;
     --force)
       FORCE="true"
@@ -50,10 +64,24 @@ if [[ "$FORCE" == "true" && "$PUBLISH" != "true" ]]; then
   exit 2
 fi
 
+if [[ -n "$BUMP_PART" ]]; then
+  case "$BUMP_PART" in
+    major|minor|patch)
+      "$ROOT_DIR/scripts/bump-version.sh" "$BUMP_PART" >/dev/null
+      ;;
+    *)
+      echo "--bump must be major, minor, or patch" >&2
+      exit 2
+      ;;
+  esac
+fi
+
+load_version
+
 if [[ "$PUBLISH" == "true" ]]; then
   TAG="v${VERSION}"
   if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1 && [[ "$FORCE" != "true" ]]; then
-    echo "Release $TAG already exists. Bump VERSION or rerun with --force to overwrite assets." >&2
+    echo "Release $TAG already exists. Run scripts/bump-version.sh patch, use --bump patch, or rerun with --force to overwrite assets." >&2
     exit 1
   fi
 fi

@@ -68,7 +68,7 @@ dist/CodexMeter-$(cat VERSION).dmg.sha256
 
 不付费使用Apple Developer Program时，可以分发未公证DMG。用户安装步骤：
 
-1. 打开`CodexMeter-0.1.0.dmg`。
+1. 打开`CodexMeter-版本号.dmg`。
 2. 将`CodexMeter.app`拖到`Applications`。
 3. 第一次按住Control点击或右键点击`CodexMeter.app`，选择`打开`。
 4. 如果macOS提示无法验证开发者，继续选择`打开`；如果仍被阻止，到`系统设置 > 隐私与安全性`中允许打开。
@@ -107,6 +107,12 @@ DMG里也包含`首次打开说明.txt`。
 
 ```bash
 scripts/bump-version.sh patch
+```
+
+也可以让发布脚本在构建前自动递增版本：
+
+```bash
+scripts/release.sh --publish --bump patch
 ```
 
 递增规则：

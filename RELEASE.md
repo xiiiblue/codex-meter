@@ -75,7 +75,7 @@ xcrun notarytool store-credentials codex-meter-notary
 提交DMG：
 
 ```bash
-xcrun notarytool submit dist/CodexMeter-0.1.0.dmg \
+xcrun notarytool submit "dist/CodexMeter-$(cat VERSION).dmg" \
   --keychain-profile codex-meter-notary \
   --wait
 ```
@@ -83,8 +83,8 @@ xcrun notarytool submit dist/CodexMeter-0.1.0.dmg \
 公证成功后装订：
 
 ```bash
-xcrun stapler staple dist/CodexMeter-0.1.0.dmg
-xcrun stapler validate dist/CodexMeter-0.1.0.dmg
+xcrun stapler staple "dist/CodexMeter-$(cat VERSION).dmg"
+xcrun stapler validate "dist/CodexMeter-$(cat VERSION).dmg"
 ```
 
 ## 5.分发前验证
@@ -112,13 +112,19 @@ cat "dist/CodexMeter-$(cat VERSION).dmg.sha256"
 scripts/bump-version.sh patch
 ```
 
+也可以让Release脚本自动递增版本后发布：
+
+```bash
+bash scripts/release.sh --publish --bump patch
+```
+
 生成产物和Release说明：
 
 ```bash
 bash scripts/release.sh
 ```
 
-直接更新或创建GitHub Release：
+创建GitHub Release：
 
 ```bash
 bash scripts/release.sh --publish

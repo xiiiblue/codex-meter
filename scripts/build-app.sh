@@ -19,6 +19,8 @@ DMG_WINDOW_BOUNDS="{120, 120, 960, 640}"
 DMG_APP_POSITION="{220, 300}"
 DMG_APPLICATIONS_POSITION="{560, 300}"
 DMG_GUIDE_POSITION="{390, 470}"
+MOUNT_POINT=""
+RW_DMG_PATH=""
 
 usage() {
   cat <<USAGE
@@ -82,6 +84,15 @@ resolve_sign_identity() {
   fi
 }
 
+cleanup_dmg() {
+  if [[ -n "$MOUNT_POINT" ]] && mount | grep -F " on $MOUNT_POINT " >/dev/null 2>&1; then
+    hdiutil detach "$MOUNT_POINT" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "$RW_DMG_PATH" && -f "$RW_DMG_PATH" ]]; then
+    rm -f "$RW_DMG_PATH"
+  fi
+}
+
 if [[ "$BUILD_MODE" == "universal" ]]; then
   swift build -c release --arch arm64 --arch x86_64 --package-path "$ROOT_DIR"
   BUILT_EXECUTABLE="$ROOT_DIR/.build/apple/Products/Release/$PRODUCT_NAME"
@@ -135,6 +146,7 @@ if [[ -n "$SIGN_IDENTITY" ]]; then
 fi
 
 if [[ "$CREATE_DMG" == "true" ]]; then
+  trap cleanup_dmg EXIT
   mkdir -p "$DIST_DIR"
   DMG_PATH="$DIST_DIR/${PRODUCT_NAME}-${VERSION}.dmg"
   DMG_SHA_PATH="$DMG_PATH.sha256"
@@ -202,6 +214,7 @@ APPLESCRIPT
 
     sync
     hdiutil detach "$MOUNT_POINT"
+    MOUNT_POINT=""
   fi
 
   hdiutil convert "$RW_DMG_PATH" \
@@ -214,6 +227,7 @@ APPLESCRIPT
   SHA_VALUE="$(shasum -a 256 "$DMG_PATH" | awk '{print $1}')"
   printf '%s  %s\n' "$SHA_VALUE" "$(basename "$DMG_PATH")" > "$DMG_SHA_PATH"
   rm -f "$RW_DMG_PATH"
+  RW_DMG_PATH=""
   echo "$DMG_SHA_PATH"
   echo "$DMG_PATH"
 fi
