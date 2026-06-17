@@ -10,6 +10,7 @@ CodexMeter是一个macOS原生菜单栏小工具，用当前机器的Codex登录
 - 支持手动刷新。
 - 支持开机自启。
 - 支持刷新频率配置：`1分钟`、`5分钟`、`15分钟`、`30分钟`、`60分钟`。
+- 支持跟随系统语言显示中文或英文。
 - 支持无GUI验证模式：`swift run CodexMeter --once`。
 
 ## 环境要求
@@ -96,6 +97,10 @@ DMG里也包含`首次打开说明.txt`。
 │   ├── MeterError.swift
 │   ├── Models.swift
 │   ├── Preferences.swift
+│   ├── Localizer.swift
+│   ├── Resources/
+│   │   ├── en.lproj/Localizable.strings
+│   │   └── zh-Hans.lproj/Localizable.strings
 │   └── main.swift
 ├── VERSION
 ├── scripts/build-app.sh

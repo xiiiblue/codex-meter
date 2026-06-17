@@ -8,7 +8,7 @@
 
 - 技术栈：SwiftPM + AppKit。
 - 入口：`Sources/CodexMeter/main.swift`，只保留命令行`--once`和App启动逻辑。
-- 核心模块：`AppDelegate.swift`负责菜单栏UI，`CodexUsageClient.swift`负责只读认证和额度请求，`LoginItemManager.swift`负责LaunchAgent，`Preferences.swift`负责用户设置，`Models.swift`和`MeterError.swift`负责数据类型和错误提示。
+- 核心模块：`AppDelegate.swift`负责菜单栏UI，`CodexUsageClient.swift`负责只读认证和额度请求，`LoginItemManager.swift`负责LaunchAgent，`Preferences.swift`负责用户设置，`Models.swift`和`MeterError.swift`负责数据类型和错误提示，`Localizer.swift`负责本地化读取。
 - 认证文件：默认读取`~/.codex/auth.json`。
 - 额度接口：`https://chatgpt.com/backend-api/wham/usage`。
 - 显示逻辑：`primary_window.used_percent`视为日限额已用百分比，`secondary_window.used_percent`视为周限额已用百分比，菜单栏显示`100-used_percent`。
@@ -20,6 +20,7 @@
 - 发布脚本：`bash scripts/release.sh`会串联Universal构建、DMG、SHA256和Release说明生成；加`--publish`时会创建GitHub Release；同版本Release已存在时默认拒绝覆盖，确认重发时使用`--force`。
 - 发布递增：`bash scripts/release.sh --publish --bump patch`会先递增`VERSION`再发布；同版本重发才使用`--force`。
 - 应用图标：源PNG为`Assets/AppIcon.png`，App包使用`Assets/AppIcon.icns`，打包脚本会复制到`Contents/Resources`并写入`CFBundleIconFile`。
+- 国际化：应用UI文案使用`Sources/CodexMeter/Resources/en.lproj`和`zh-Hans.lproj`，打包脚本会复制`.lproj`目录到App资源目录。
 
 ## 后续交接注意
 

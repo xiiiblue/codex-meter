@@ -34,7 +34,7 @@ final class LoginItemManager {
         guard let plist = NSDictionary(contentsOf: plistURL) as? [String: Any],
               let programArguments = plist["ProgramArguments"] as? [String],
               let savedPath = programArguments.first else {
-            return .stale(savedPath: "未知路径")
+            return .stale(savedPath: L.text("path.unknown"))
         }
         return savedPath == currentExecutablePath ? .enabled : .stale(savedPath: savedPath)
     }

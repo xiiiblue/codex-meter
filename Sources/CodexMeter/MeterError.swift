@@ -10,15 +10,15 @@ enum MeterError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .authFileMissing(let path):
-            return "找不到认证文件: \(path)"
+            return L.format("error.authFileMissing", path)
         case .chatGPTAuthRequired:
-            return "需要ChatGPT登录认证"
+            return L.text("error.chatGPTAuthRequired")
         case .invalidResponse(let code):
-            return "接口返回HTTP \(code)"
+            return L.format("error.invalidResponse", code)
         case .codexAuthExpired:
-            return "Codex登录态可能已过期"
+            return L.text("error.codexAuthExpired")
         case .noRateLimits:
-            return "接口没有返回额度窗口"
+            return L.text("error.noRateLimits")
         }
     }
 
@@ -26,21 +26,21 @@ enum MeterError: LocalizedError {
         switch self {
         case .authFileMissing:
             return [
-                "未检测到Codex登录认证",
-                "请先运行: codex login",
-                "完成登录后点“立即刷新”"
+                L.text("guidance.authMissing.1"),
+                L.text("guidance.authMissing.2"),
+                L.text("guidance.authMissing.3")
             ]
         case .chatGPTAuthRequired:
             return [
-                "当前不是ChatGPT登录态",
-                "请重新运行: codex login",
-                "登录时选择ChatGPT账号"
+                L.text("guidance.chatGPTRequired.1"),
+                L.text("guidance.chatGPTRequired.2"),
+                L.text("guidance.chatGPTRequired.3")
             ]
         case .codexAuthExpired:
             return [
-                "CodexMeter不会写入认证文件",
-                "请在Codex中重新登录或刷新登录态",
-                "完成后点“立即刷新”"
+                L.text("guidance.authExpired.1"),
+                L.text("guidance.authExpired.2"),
+                L.text("guidance.authExpired.3")
             ]
         case .invalidResponse, .noRateLimits:
             return nil

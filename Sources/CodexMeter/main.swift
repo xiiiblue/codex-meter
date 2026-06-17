@@ -9,7 +9,7 @@ if CommandLine.arguments.contains("--once") {
             let snapshot = try await CodexUsageClient(authPath: authPath).fetchUsage()
             let day = snapshot.primary?.remainingPercent
             let week = snapshot.secondary?.remainingPercent
-            print("日\(day.map(String.init) ?? "--")% 周\(week.map(String.init) ?? "--")%")
+            print(L.format("cli.onceOutput", day.map(String.init) ?? "--", week.map(String.init) ?? "--"))
             exit(0)
         } catch {
             fputs("\(error.localizedDescription)\n", stderr)

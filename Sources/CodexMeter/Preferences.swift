@@ -1,18 +1,22 @@
 import Foundation
 
 struct RefreshInterval: CaseIterable {
-    let title: String
+    let titleKey: String
     let seconds: TimeInterval
 
     static let allCases: [RefreshInterval] = [
-        RefreshInterval(title: "1分钟", seconds: 60),
-        RefreshInterval(title: "5分钟", seconds: 300),
-        RefreshInterval(title: "15分钟", seconds: 900),
-        RefreshInterval(title: "30分钟", seconds: 1_800),
-        RefreshInterval(title: "60分钟", seconds: 3_600)
+        RefreshInterval(titleKey: "refreshInterval.1m", seconds: 60),
+        RefreshInterval(titleKey: "refreshInterval.5m", seconds: 300),
+        RefreshInterval(titleKey: "refreshInterval.15m", seconds: 900),
+        RefreshInterval(titleKey: "refreshInterval.30m", seconds: 1_800),
+        RefreshInterval(titleKey: "refreshInterval.60m", seconds: 3_600)
     ]
 
     static let defaultSeconds: TimeInterval = 300
+
+    var title: String {
+        L.text(titleKey)
+    }
 
     static func nearest(to seconds: TimeInterval) -> RefreshInterval {
         allCases.min { abs($0.seconds - seconds) < abs($1.seconds - seconds) } ?? allCases[1]
@@ -28,13 +32,13 @@ enum DisplayMode: String, CaseIterable {
     var title: String {
         switch self {
         case .dayWeek:
-            return "日24% 周32%"
+            return L.text("displayMode.dayWeek")
         case .compact:
             return "D24 W32"
         case .lowestOnly:
             return "Codex 24%"
         case .dayOnly:
-            return "仅日限额"
+            return L.text("displayMode.dayOnly")
         }
     }
 }

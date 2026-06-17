@@ -50,8 +50,8 @@ final class CodexUsageClient {
         }
 
         let usage = try JSONDecoder().decode(UsageResponse.self, from: data)
-        let primary = snapshot(title: "日限额", window: usage.rateLimit.primaryWindow)
-        let secondary = snapshot(title: "周限额", window: usage.rateLimit.secondaryWindow)
+        let primary = snapshot(title: L.text("limit.day"), window: usage.rateLimit.primaryWindow)
+        let secondary = snapshot(title: L.text("limit.week"), window: usage.rateLimit.secondaryWindow)
         guard primary != nil || secondary != nil else {
             throw MeterError.noRateLimits
         }

@@ -106,6 +106,11 @@ mkdir -p "$MACOS_DIR"
 mkdir -p "$RESOURCES_DIR"
 cp "$BUILT_EXECUTABLE" "$MACOS_DIR/$PRODUCT_NAME"
 cp "$ROOT_DIR/Assets/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+for localization in "$ROOT_DIR"/Sources/CodexMeter/Resources/*.lproj; do
+  if [[ -d "$localization" ]]; then
+    cp -R "$localization" "$RESOURCES_DIR/"
+  fi
+done
 
 cat > "$CONTENTS_DIR/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -126,6 +131,13 @@ cat > "$CONTENTS_DIR/Info.plist" <<PLIST
   <string>${VERSION}</string>
   <key>CFBundleVersion</key>
   <string>1</string>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleLocalizations</key>
+  <array>
+    <string>en</string>
+    <string>zh-Hans</string>
+  </array>
   <key>LSMinimumSystemVersion</key>
   <string>14.0</string>
   <key>LSUIElement</key>

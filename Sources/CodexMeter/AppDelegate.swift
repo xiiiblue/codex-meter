@@ -19,7 +19,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.font = NSFont.monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .semibold)
         statusItem.button?.title = "Codex ..."
 
-        rebuildMenu(message: "正在刷新...")
+        rebuildMenu(message: L.text("status.refreshing"))
         refresh()
         scheduleTimer()
     }
@@ -83,17 +83,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             menu.addItem(.separator())
             if let planType = snapshot.planType {
-                menu.addItem(NSMenuItem(title: "订阅: \(planType)", action: nil, keyEquivalent: ""))
+                menu.addItem(NSMenuItem(title: L.format("menu.subscription", planType), action: nil, keyEquivalent: ""))
             }
-            menu.addItem(NSMenuItem(title: "上次成功刷新: \(format(snapshot.refreshedAt))", action: nil, keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: L.format("menu.lastSuccessfulRefresh", format(snapshot.refreshedAt)), action: nil, keyEquivalent: ""))
             if let nextRefreshAt = timer?.fireDate {
-                menu.addItem(NSMenuItem(title: "下次刷新: \(format(nextRefreshAt))", action: nil, keyEquivalent: ""))
+                menu.addItem(NSMenuItem(title: L.format("menu.nextRefresh", format(nextRefreshAt)), action: nil, keyEquivalent: ""))
             }
             if let refreshError {
                 menu.addItem(.separator())
-                let failedAt = latestRefreshErrorAt.map(format) ?? "未知时间"
-                menu.addItem(NSMenuItem(title: "上次刷新失败: \(failedAt)", action: nil, keyEquivalent: ""))
-                menu.addItem(NSMenuItem(title: "失败原因: \(refreshError)", action: nil, keyEquivalent: ""))
+                let failedAt = latestRefreshErrorAt.map(format) ?? L.text("time.unknown")
+                menu.addItem(NSMenuItem(title: L.format("menu.lastRefreshFailed", failedAt), action: nil, keyEquivalent: ""))
+                menu.addItem(NSMenuItem(title: L.format("menu.failureReason", refreshError), action: nil, keyEquivalent: ""))
             }
         } else if let message {
             menu.addItem(NSMenuItem(title: message, action: nil, keyEquivalent: ""))
@@ -106,13 +106,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         menu.addItem(.separator())
-        let refreshItem = NSMenuItem(title: "立即刷新", action: #selector(refreshFromMenu), keyEquivalent: "r")
+        let refreshItem = NSMenuItem(title: L.text("menu.refreshNow"), action: #selector(refreshFromMenu), keyEquivalent: "r")
         refreshItem.target = self
         menu.addItem(refreshItem)
         addSettingsItems()
-        menu.addItem(NSMenuItem(title: "认证文件: \(authPath)", action: nil, keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: L.format("menu.authFile", authPath), action: nil, keyEquivalent: ""))
         menu.addItem(.separator())
-        let quitItem = NSMenuItem(title: "退出", action: #selector(quit), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: L.text("menu.quit"), action: #selector(quit), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -122,22 +122,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func addSettingsItems() {
         let loginStatus = LoginItemManager.shared.status
         if case .stale = loginStatus {
-            menu.addItem(NSMenuItem(title: "开机自启路径已过期", action: nil, keyEquivalent: ""))
+            menu.addItem(NSMenuItem(title: L.text("menu.loginItemPathExpired"), action: nil, keyEquivalent: ""))
         }
 
-        let loginItem = NSMenuItem(title: "开机自启", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        let loginItem = NSMenuItem(title: L.text("menu.launchAtLogin"), action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         loginItem.target = self
         loginItem.state = isLaunchAtLoginEnabled(loginStatus) ? .on : .off
         menu.addItem(loginItem)
 
         if case .stale = loginStatus {
-            let repairItem = NSMenuItem(title: "修复开机自启路径", action: #selector(repairLaunchAtLogin), keyEquivalent: "")
+            let repairItem = NSMenuItem(title: L.text("menu.repairLoginItemPath"), action: #selector(repairLaunchAtLogin), keyEquivalent: "")
             repairItem.target = self
             menu.addItem(repairItem)
         }
 
         let currentInterval = Preferences.refreshIntervalSeconds
-        let intervalItem = NSMenuItem(title: "刷新频率", action: nil, keyEquivalent: "")
+        let intervalItem = NSMenuItem(title: L.text("menu.refreshInterval"), action: nil, keyEquivalent: "")
         let intervalMenu = NSMenu()
         for option in RefreshInterval.allCases {
             let item = NSMenuItem(title: option.title, action: #selector(setRefreshInterval), keyEquivalent: "")
@@ -150,7 +150,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(intervalItem)
 
         let currentDisplayMode = Preferences.displayMode
-        let displayModeItem = NSMenuItem(title: "显示模式", action: nil, keyEquivalent: "")
+        let displayModeItem = NSMenuItem(title: L.text("menu.displayMode"), action: nil, keyEquivalent: "")
         let displayModeMenu = NSMenu()
         for mode in DisplayMode.allCases {
             let item = NSMenuItem(title: mode.title, action: #selector(setDisplayMode), keyEquivalent: "")
@@ -168,8 +168,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let reset = limit.resetAt.map { "，重置: \(format($0))（\(relativeTimeDescription(until: $0))）" } ?? ""
-        menu.addItem(NSMenuItem(title: "\(limit.title): 剩余\(limit.remainingPercent)%\(reset)", action: nil, keyEquivalent: ""))
+        let reset = limit.resetAt.map { L.format("limit.resetSuffix", format($0), relativeTimeDescription(until: $0)) } ?? ""
+        menu.addItem(NSMenuItem(title: L.format("limit.menuLine", limit.title, limit.remainingPercent, reset), action: nil, keyEquivalent: ""))
     }
 
     private func lowQuotaWarnings(for snapshot: MeterSnapshot) -> [String] {
@@ -178,10 +178,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 return nil
             }
             if limit.remainingPercent <= 10 {
-                return "\(limit.title)额度告急：仅剩\(limit.remainingPercent)%"
+                return L.format("quota.critical", limit.title, limit.remainingPercent)
             }
             if limit.remainingPercent <= 20 {
-                return "\(limit.title)额度偏低：剩余\(limit.remainingPercent)%"
+                return L.format("quota.low", limit.title, limit.remainingPercent)
             }
             return nil
         }
@@ -191,21 +191,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let interval = max(0, date.timeIntervalSinceNow)
         let minutes = Int(interval / 60)
         if minutes < 60 {
-            return "约\(max(1, minutes))分钟后"
+            return L.format("relative.minutes", max(1, minutes))
         }
 
         let hours = minutes / 60
         if hours < 48 {
-            return "约\(hours)小时后"
+            return L.format("relative.hours", hours)
         }
 
         let days = hours / 24
-        return "约\(days)天后"
+        return L.format("relative.days", days)
     }
 
     private func format(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.locale = Locale.current
         formatter.dateStyle = .short
         formatter.timeStyle = .short
         return formatter.string(from: date)
@@ -221,7 +221,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try LoginItemManager.shared.setEnabled(shouldEnable)
             rebuildCurrentMenu()
         } catch {
-            showError("无法更新开机自启: \(error.localizedDescription)")
+            showError(L.format("alert.updateLoginItemFailed", error.localizedDescription))
         }
     }
 
@@ -230,7 +230,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try LoginItemManager.shared.setEnabled(true)
             rebuildCurrentMenu()
         } catch {
-            showError("无法修复开机自启路径: \(error.localizedDescription)")
+            showError(L.format("alert.repairLoginItemFailed", error.localizedDescription))
         }
     }
 
@@ -260,7 +260,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let latestSnapshot {
             rebuildMenu(snapshot: latestSnapshot, refreshError: latestRefreshError)
         } else {
-            rebuildMenu(message: "正在刷新...")
+            rebuildMenu(message: L.text("status.refreshing"))
         }
     }
 
@@ -286,14 +286,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         switch Preferences.displayMode {
         case .dayWeek:
-            return "日\(percentText(day)) 周\(percentText(week))"
+            return L.format("status.dayWeek", percentText(day), percentText(week))
         case .compact:
             return "D\(percentText(day)) W\(percentText(week))"
         case .lowestOnly:
             let values = [day, week].compactMap { $0 }
             return "Codex \(percentText(values.min()))"
         case .dayOnly:
-            return "日\(percentText(day))"
+            return L.format("status.dayOnly", percentText(day))
         }
     }
 
