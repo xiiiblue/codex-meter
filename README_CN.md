@@ -2,11 +2,13 @@
 
 [English](./README.md)
 
-CodexMeter是一个macOS原生菜单栏小工具，用当前机器的Codex登录态读取ChatGPT账号的Codex额度，并在菜单栏显示日限额和周限额剩余百分比。
+CodexMeter是一个简单易用的macOS原生菜单栏小工具，用当前机器的Codex登录态读取ChatGPT账号的Codex额度，并把日限额和周限额剩余百分比直接显示在菜单栏。你不需要二次点击进入详情页，就能一目了然地看到当前额度是否够用。
+
+![CodexMeter菜单栏额度概览](./Assets/README-screenshot.png)
 
 ## 功能
 
-- 菜单栏直接显示`日xx% 周xx%`。
+- 菜单栏直接显示`日xx% 周xx%`，不用打开菜单也能一眼看到。
 - 支持菜单栏显示模式切换：标准、紧凑、仅最低额度、仅日限额。
 - 下拉菜单显示日限额、周限额、重置时间、订阅类型和最近刷新时间。
 - 支持手动刷新。
@@ -92,6 +94,7 @@ DMG里也包含`First Open Guide.txt`。
 ├── Assets/
 │   ├── AppIcon.icns
 │   ├── AppIcon.png
+│   ├── README-screenshot.png
 │   └── Installer/DmgBackground.png
 ├── Sources/CodexMeter/
 │   ├── AppDelegate.swift

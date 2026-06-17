@@ -2,11 +2,13 @@
 
 [中文](./README_CN.md)
 
-CodexMeter is a native macOS menu bar utility that reads the current machine's Codex login state, fetches Codex usage for the ChatGPT account, and shows the remaining daily and weekly quota percentages directly in the menu bar.
+CodexMeter is a small native macOS menu bar utility for checking Codex quota at a glance. It reads the current machine's Codex login state, fetches Codex usage for the ChatGPT account, and keeps the remaining daily and weekly percentages visible directly in the menu bar, so there is no need to click into a secondary view just to see whether you have quota left.
+
+![CodexMeter menu bar quota overview](./Assets/README-screenshot.png)
 
 ## Features
 
-- Shows `Dxx% Wxx%` directly in the menu bar.
+- Shows `Dxx% Wxx%` directly in the menu bar, visible at a glance without opening the menu.
 - Supports menu bar display modes: standard, compact, lowest quota only, and daily quota only.
 - Shows daily quota, weekly quota, reset times, subscription type, and latest refresh time in the menu.
 - Supports manual refresh.
@@ -92,6 +94,7 @@ The DMG also includes `First Open Guide.txt`.
 ├── Assets/
 │   ├── AppIcon.icns
 │   ├── AppIcon.png
+│   ├── README-screenshot.png
 │   └── Installer/DmgBackground.png
 ├── Sources/CodexMeter/
 │   ├── AppDelegate.swift
